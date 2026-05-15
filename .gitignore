@@ -1,1 +1,1 @@
-Nothing needs to be added to .gitignore since the only change is adding a test JavaScript file (.test.js), which is a source code file and should not be ignored.
+Nothing needs to be added to .gitignore since only source files (.html, .js) were added without any build artifacts, dependencies, or temporary files.

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Bahan Pengajaran - Audio/MP3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #888;
+            font-size: 13px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-info {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .file-info.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .file-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .file-icon {
+            font-size: 40px;
+        }
+
+        .file-meta {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+        }
+
+        .supported-formats {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        .supported-formats strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Upload Bahan Pengajaran</h1>
+        <p class="subtitle">Muat naik fail audio untuk bahan pembelajaran</p>
+
+        <!-- Upload Area -->
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <p class="upload-text">Seret & lepaskan fail audio di sini</p>
+            <p class="upload-hint">atau klik untuk memilih fail</p>
+            <input type="file" id="fileInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac">
+        </div>
+
+        <!-- Supported Formats -->
+        <div class="supported-formats">
+            <strong>Format yang disokong:</strong>
+            MP3, WAV, OGG, M4A, AAC, FLAC (Maksimum: 50MB)
+        </div>
+
+        <!-- File Info & Preview -->
+        <div class="file-info" id="fileInfo">
+            <div class="file-details">
+                <span class="file-icon">🎵</span>
+                <div class="file-meta">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-size" id="fileSize"></div>
+                </div>
+            </div>
+            <audio class="audio-player" id="audioPlayer" controls></audio>
+        </div>
+
+        <!-- Metadata Form -->
+        <form id="uploadForm" style="display: none;">
+            <div class="form-group">
+                <label for="title">Tajuk Bahan *</label>
+                <input type="text" id="title" placeholder="Masukkan tajuk bahan pengajaran" required>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Subjek / Mata Pelajaran</label>
+                <input type="text" id="subject" placeholder="Contoh: Bahasa Melayu, Matematik">
+            </div>
+
+            <div class="form-group">
+                <label for="grade">Tahun / Tingkatan</label>
+                <select id="grade">
+                    <option value="">Pilih tahap</option>
+                    <option value="tahun1">Tahun 1</option>
+                    <option value="tahun2">Tahun 2</option>
+                    <option value="tahun3">Tahun 3</option>
+                    <option value="tahun4">Tahun 4</option>
+                    <option value="tahun5">Tahun 5</option>
+                    <option value="tahun6">Tahun 6</option>
+                    <option value="ting1">Tingkatan 1</option>
+                    <option value="ting2">Tingkatan 2</option>
+                    <option value="ting3">Tingkatan 3</option>
+                    <option value="ting4">Tingkatan 4</option>
+                    <option value="ting5">Tingkatan 5</option>
+                    <option value="lain-lain">Lain-lain</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Penerangan Ringkas</label>
+                <textarea id="description" placeholder="Terangkan kandungan audio ini..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="uploadBtn">
+                📤 Muat Naik Sekarang
+            </button>
+            <button type="button" class="btn btn-secondary" id="cancelBtn">
+                ❌ Batal
+            </button>
+        </form>
+
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p class="progress-text" id="progressText">Memuat naik... 0%</p>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+            ✅ <strong>Berjaya!</strong> Bahan pengajaran telah dimuat naik.
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage">
+            ❌ <strong>Ralat!</strong> Sila cuba lagi.
+        </div>
+    </div>
+
+    <script src="audio-upload.js"></script>
+</body>
+</html>
