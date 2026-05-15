@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Bahan Pengajaran Audio</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        /* Drag & Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--primary);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #eff6ff;
+            position: relative;
+        }
+
+        .drop-zone.drag-over {
+            background-color: #dbeafe;
+            border-color: var(--primary-dark);
+            transform: scale(1.02);
+        }
+
+        .drop-zone p {
+            margin: 10px 0 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .icon-upload {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* File Info & Preview */
+        .file-info {
+            margin-top: 1.5rem;
+            display: none; /* Hidden by default */
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .file-details {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .file-icon {
+            font-size: 1.5rem;
+        }
+
+        .file-name {
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 10px;
+            outline: none;
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-top: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"], 
+        textarea, 
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box; /* Fix padding issue */
+        }
+
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        /* Button & Progress */
+        .btn-upload {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: background 0.2s;
+        }
+
+        .btn-upload:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-upload:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-text {
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            color: #6b7280;
+        }
+
+        .success-message {
+            color: var(--success);
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: 600;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📤 Upload Bahan Audio</h2>
+    
+    <!-- Kawasan Drag & Drop -->
+    <div class="drop-zone" id="dropZone">
+        <div class="icon-upload">🎵</div>
+        <p><strong>Seret fail MP3/WAV ke sini</strong></p>
+        <p>atau klik untuk memilih fail</p>
+        <input type="file" id="fileInput" accept="audio/*">
+    </div>
+
+    <!-- Maklumat Fail & Preview -->
+    <div class="file-info" id="fileInfo">
+        <div class="file-details">
+            <span class="file-icon">🎧</span>
+            <span class="file-name" id="fileName">nama_fail.mp3</span>
+        </div>
+        <div style="font-size: 0.85rem; color: #666;" id="fileSize">Saiz: 0 MB</div>
+        <audio id="audioPreview" controls></audio>
+    </div>
+
+    <!-- Borang Metadata -->
+    <div class="form-group">
+        <label for="topic">Tajuk Pengajaran</label>
+        <input type="text" id="topic" placeholder="Cth: Bab 1 - Pengenalan Sains">
+    </div>
+
+    <div class="form-group">
+        <label for="description">Keterangan Ringkas</label>
+        <textarea id="description" placeholder="Huraikan kandungan audio ini..."></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="category">Kategori</label>
+        <select id="category">
+            <option value="kuliah">Kuliah / Syarahan</option>
+            <option value="podcast">Podcast Pendidikan</option>
+            <option value="latihan">Latihan Sebutan/Bacaan</option>
+            <option value="lain-lain">Lain-lain</option>
+        </select>
+    </div>
+
+    <!-- Butang Upload -->
+    <button class="btn-upload" id="uploadBtn" disabled>Muat Naik Sekarang</button>
+
+    <!-- Progress Bar -->
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="status-text" id="statusText">Memuat naik... 0%</div>
+    </div>
+
+    <div class="success-message" id="successMessage">
+        ✅ Bahan berjaya dimuat naik!
+    </div>
+</div>
+
+<script>
+    // Elemen DOM
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileNameDisplay = document.getElementById('fileName');
+    const fileSizeDisplay = document.getElementById('fileSize');
+    const audioPreview = document.getElementById('audioPreview');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const statusText = document.getElementById('statusText');
+    const successMessage = document.getElementById('successMessage');
+
+    let selectedFile = null;
+
+    // 1. Fungsi Klik untuk Pilih Fail
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFile(e.target.files[0]);
+        }
+    });
+
+    // 2. Fungsi Drag & Drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+
+    // 3. Proses Fail
+    function handleFile(file) {
+        // Validasi jenis fail
+        if (!file.type.startsWith('audio/')) {
+            alert('Ralat: Sila pilih fail audio (MP3, WAV, OGG).');
+            return;
+        }
+
+        selectedFile = file;
+
+        // Paparkan maklumat fail
+        fileNameDisplay.textContent = file.name;
+        fileSizeDisplay.textContent = `Saiz: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+        
+        // Set preview audio
+        const fileURL = URL.createObjectURL(file);
+        audioPreview.src = fileURL;
+        
+        // Tunjuk bahagian info dan aktifkan butang
+        fileInfo.style.display = 'block';
+        uploadBtn.disabled = false;
+        
+        // Reset status sebelumnya
+        successMessage.style.display = 'none';
+        progressContainer.style.display = 'none';
+        progressFill.style.width = '0%';
+    }
+
+    // 4. Simulasi Upload
+    uploadBtn.addEventListener('click', () => {
+        if (!selectedFile) return;
+
+        const topic = document.getElementById('topic').value;
+        if (!topic) {
+            alert('Sila masukkan Tajuk Pengajaran.');
+            return;
+        }
+
+        // UI Updates
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Sedang Memuat Naik...';
+        progressContainer.style.display = 'block';
+        successMessage.style.display = 'none';
+
+        let progress = 0;
+        
+        // Simulasi progress bar (kerana ini demo frontend tanpa server sebenar)
+        const interval = setInterval(() => {
+            progress += Math.random() * 10;
+            if (progress > 100) progress = 100;
+
+            progressFill.style.width = `${progress}%`;
+            statusText.textContent = `Memuat naik... ${Math.round(progress)}%`;
+
+            if (progress === 100) {
+                clearInterval(interval);
+                finishUpload();
+            }
+        }, 200);
+    });
+
+    function finishUpload() {
+        statusText.textContent = 'Selesai!';
+        uploadBtn.textContent = 'Muat Naik Sekarang';
+        uploadBtn.disabled = false;
+        successMessage.style.display = 'block';
+        
+        // Di sini anda boleh tambah kod AJAX/Fetch untuk hantar ke server sebenar
+        console.log("Fail dihantar:", selectedFile.name);
+        console.log("Tajuk:", document.getElementById('topic').value);
+        
+        // Optional: Reset form selepas 3 saat
+        setTimeout(() => {
+            // successMessage.style.display = 'none';
+            // fileInfo.style.display = 'none';
+            // fileInput.value = '';
+            // selectedFile = null;
+            // uploadBtn.disabled = true;
+            // progressFill.style.width = '0%';
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>
