@@ -241,6 +241,65 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { box-shadow: va
 .audio-fallback-notice button { background: var(--sage-500); color: white; border: none; padding: 6px 14px; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600; cursor: pointer; margin-top: var(--space-2); font-family: inherit; }
 .audio-fallback-notice button:hover { background: var(--sage-600); }
 
+
+// Fungsi untuk menerima audio dari alat suntikan
+function checkAudioInjection() {
+    const TRANSFER_KEY = 'emodul_ikbar_audio_inject';
+    const storedData = localStorage.getItem(TRANSFER_KEY);
+
+    if (storedData) {
+        try {
+            const payload = JSON.parse(storedData);
+            const audioData = payload.audio;
+
+            // 1. Masukkan ke dalam array data eModul (contoh variable global)
+            // Anggapkan anda ada array bernama 'bahanPengajaran' atau 'modules'
+            if (typeof bahanPengajaran !== 'undefined') {
+                bahanPengajaran.push({
+                    id: 'inj_' + Date.now(),
+                    type: 'audio',
+                    title: audioData.title,
+                    src: audioData.data, // Data Base64 penuh
+                    category: audioData.category,
+                    addedAt: new Date().toLocaleTimeString()
+                });
+                
+                // 2. Refresh paparan UI (panggil fungsi render asal anda)
+                if (typeof renderBahanPengajaran === 'function') {
+                    renderBahanPengajaran();
+                } else if (typeof loadModules === 'function') {
+                    loadModules();
+                } else {
+                    // Fallback: Reload page jika tiada fungsi render spesifik
+                    // location.reload(); 
+                    alert('Audio berjaya ditambah! Sila refresh halaman jika tidak muncul.');
+                }
+
+                // 3. Buang data dari localStorage supaya tak masuk dua kali
+                localStorage.removeItem(TRANSFER_KEY);
+                
+                console.log('Audio diterima:', audioData.title);
+            } else {
+                console.warn('Variable bahanPengajaran tidak dijumpai. Sila semak nama variable dalam kod eModul.');
+            }
+
+        } catch (e) {
+            console.error('Ralat memproses audio suntikan:', e);
+        }
+    }
+}
+
+// Dengar perubahan localStorage dari tab lain
+window.addEventListener('storage', (e) => {
+    if (e.key === 'emodul_ikbar_audio_inject') {
+        checkAudioInjection();
+    }
+});
+
+// Semak juga bila halaman dimuatkan (untuk kes pengguna buka tab eModul dulu)
+document.addEventListener('DOMContentLoaded', checkAudioInjection);
+
+
 /* ============================================
    VOICE RECORDER — V6.2 NEW
    ============================================ */
@@ -1289,6 +1348,145 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { box-shadow: va
 
 <!-- SCRIPT -->
 <script>
+// --- FUNGSI BARU: LOAD AUDIO DARI INDEXEDDB ---
+
+const AUDIO_DB_NAME = 'eModulAudioDB';
+const AUDIO_STORE_NAME = 'audioFiles';
+
+function loadAudioFromDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(AUDIO_DB_NAME, 1);
+        request.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction([AUDIO_STORE_NAME], 'readonly');
+            const store = transaction.objectStore(AUDIO_STORE_NAME);
+            const getAllRequest = store.getAll();
+            
+            getAllRequest.onsuccess = () => {
+                resolve(getAllRequest.result); // Return array of audio records
+            };
+            getAllRequest.onerror = () => reject(getAllRequest.error);
+        };
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function renderAudioList(audioList) {
+    // Cari kontena senarai bahan dalam eModul anda. 
+    // Anda mungkin perlu ubah ID '#bahanList' mengikut struktur HTML eModul anda.
+    // Jika tiada kontena khas, kita buat satu baru atau tambah ke bahagian 'Resources'.
+    
+    let container = document.getElementById('audioUploadList');
+    if (!container) {
+        // Cipta kontena jika belum ada (letak di bahagian atas atau tengah modul)
+        container = document.createElement('div');
+        container.id = 'audioUploadList';
+        container.style.marginTop = '20px';
+        container.style.padding = '15px';
+        container.style.background = '#f0f9ff';
+        container.style.borderRadius = '8px';
+        container.innerHTML = '<h3>📂 Bahan Audio Dimuat Naik</h3><div id="audioItems"></div>';
+        
+        // Masukkan ke dalam badan utama eModul (cari element utama seperti 'main' atau 'container')
+        const mainContent = document.querySelector('.container') || document.body;
+        mainContent.prepend(container);
+    }
+
+    const itemsContainer = container.querySelector('#audioItems');
+    itemsContainer.innerHTML = ''; // Kosongkan dulu
+
+    if (audioList.length === 0) {
+        itemsContainer.innerHTML = '<p>Belum ada audio dimuat naik.</p>';
+        return;
+    }
+
+    audioList.forEach(audio => {
+        const div = document.createElement('div');
+        div.style.marginBottom = '15px';
+        div.style.padding = '10px';
+        div.style.background = 'white';
+        div.style.border = '1px solid #ddd';
+        div.style.borderRadius = '6px';
+        
+        const url = URL.createObjectURL(audio.file);
+        
+        div.innerHTML = `
+            <div style="font-weight:bold; color:#2563eb;">${audio.topic} <span style="font-size:0.8em; color:#666;">(${audio.category})</span></div>
+            <div style="font-size:0.85rem; margin-bottom:5px;">Fail: ${audio.name} (${(audio.size/1024/1024).toFixed(2)} MB)</div>
+            <audio controls src="${url}" style="width:100%"></audio>
+        `;
+        itemsContainer.appendChild(div);
+    });
+}
+
+// Panggil fungsi ini apabila eModul dimuatkan
+window.addEventListener('load', () => {
+    loadAudioFromDB()
+        .then(list => renderAudioList(list))
+        .catch(err => console.error('Gagal load audio:', err));
+});
+
+// Dengar perubahan dari tab upload (jika user upload sambil buka eModul)
+window.addEventListener('storage', (e) => {
+    if (e.key === 'eModul_NewAudioTrigger') {
+        loadAudioFromDB().then(list => renderAudioList(list));
+    }
+});
+
+// --- KOD BARU: MUAT TURUN DATA DARI UPLOAD TOOL ---
+function loadExternalAudioMaterials() {
+    const storedData = localStorage.getItem('ikbar_audio_materials');
+    if (storedData) {
+        const materials = JSON.parse(storedData);
+        const container = document.getElementById('audioLibraryContainer'); // Pastikan ID ini wujud di eModul anda
+        
+        if (container && materials.length > 0) {
+            // Kosongkan dulu jika perlu, atau append
+            // container.innerHTML = ''; 
+            
+            materials.forEach(item => {
+                // Cipta elemen audio baru dynamically
+                const card = document.createElement('div');
+                card.className = 'audio-card'; // Guna class CSS eModul anda
+                card.style.border = '1px solid #ddd';
+                card.style.padding = '10px';
+                card.style.marginBottom = '10px';
+                card.style.borderRadius = '8px';
+                card.style.background = '#f9f9f9';
+
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong>${item.title}</strong> <small>(${item.category})</small><br>
+                            <span style="font-size:0.8em; color:#666;">${item.date} - ${item.filename}</span>
+                        </div>
+                    </div>
+                    <audio controls style="width:100%; margin-top:5px;">
+                        <source src="${item.src}" type="audio/mp3">
+                        Browser anda tidak menyokong elemen audio.
+                    </audio>
+                `;
+                container.appendChild(card);
+            });
+            console.log(`${materials.length} bahan audio berjaya dimuatkan dari upload tool.`);
+        }
+    }
+}
+
+// Panggil fungsi ini apabila eModul dibuka
+document.addEventListener('DOMContentLoaded', () => {
+    // ... kod asal eModul ...
+    
+    // TAMBAH BARIS INI:
+    loadExternalAudioMaterials(); 
+});
+
+<!-- Letak ini di dalam eModul HTML di mana anda mahu audio muncul -->
+<div id="audioLibraryContainer" style="margin-top: 20px;">
+    <h3>Bahan Audio Dimuat Naik</h3>
+    <!-- Audio akan muncul di sini secara automatik -->
+</div>
+
 // ============================================
 // CONFIG
 // ============================================
