@@ -644,7 +644,6 @@ document.addEventListener('DOMContentLoaded', checkAudioInjection);
 </head>
 
 <body>
-
 <!-- A11Y BAR -->
 <div class="a11y-bar" role="toolbar" aria-label="Tetapan kebolehcapaian">
   <button class="a11y-btn" onclick="toggleTheme()" title="Tukar tema" aria-label="Tukar tema">🌓</button>
@@ -2331,6 +2330,235 @@ window.addEventListener('DOMContentLoaded', () => {
   checkPendingQueue();
   window.addEventListener('online', checkPendingQueue);
 });
+
+  /* --- MULA KOD INTEGRASI AUDIO UPLOAD (DIPERTINGKATKAN) --- */
+
+const DB_NAME = 'eModulIKBAR_DB';
+const DB_VERSION = 1;
+let dbAudio;
+
+// 1. Inisialisasi Database
+function initAudioDB() {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+    request.onupgradeneeded = function(event) {
+        dbAudio = event.target.result;
+        if (!dbAudio.objectStoreNames.contains('audioUploads')) {
+            dbAudio.createObjectStore('audioUploads', { keyPath: 'id', autoIncrement: true });
+        }
+    };
+
+    request.onsuccess = function(event) {
+        dbAudio = event.target.result;
+        console.log("✅ Database Audio disambungkan.");
+        loadUploadedAudio(); // Load data bila siap
+    };
+
+    request.onerror = function(event) {
+        console.error("❌ Ralat Database:", event.target.errorCode);
+    };
+}
+
+// 2. Ambil Data dari Database
+function loadUploadedAudio() {
+    if (!dbAudio) return;
+
+    const transaction = dbAudio.transaction(['audioUploads'], 'readonly');
+    const store = transaction.objectStore('audioUploads');
+    const request = store.getAll();
+
+    request.onsuccess = function() {
+        const items = request.result;
+        injectAudioUI(items);
+    };
+}
+
+// 3. Suntik UI ke dalam Halaman (Logik Pencarian Pintar)
+function injectAudioUI(items) {
+    // Cari container sedia ada untuk elak duplikasi
+    let existingContainer = document.getElementById('customUploadedAudioSection');
+    
+    if (existingContainer) {
+        // Jika dah ada, kosongkan dan buat baru
+        existingContainer.innerHTML = '';
+    } else {
+        // CARI LOKASI UNTUK SUNTIK:
+        // Strategi A: Cari berdasarkan label "Rakaman" atau "Voice"
+        const allHeaders = document.querySelectorAll('h2, h3, h4, label, .section-title');
+        let targetParent = null;
+        
+        for (let el of allHeaders) {
+            const text = el.innerText.toLowerCase();
+            if (text.includes('rakaman') || text.includes('voice') || text.includes('suara')) {
+                // Naik ke parent yang lebih besar (section atau div container)
+                targetParent = el.closest('.content-section, .card, .panel, div[style*="padding"]');
+                if (!targetParent) targetParent = el.parentElement;
+                break;
+            }
+        }
+
+        // Strategi B: Jika tak jumpa, cari butang "Rekod" atau "Mula Rakam"
+        if (!targetParent) {
+            const recButtons = document.querySelectorAll('button');
+            for (let btn of recButtons) {
+                if (btn.innerText.toLowerCase().includes('rekod') || btn.innerText.toLowerCase().includes('record')) {
+                    targetParent = btn.closest('.voice-controls, .control-panel, div');
+                    break;
+                }
+            }
+        }
+
+        // Strategi C: Last resort, letak di akhir body atau sebelum footer
+        if (!targetParent) {
+            targetParent = document.querySelector('.main-content') || document.body;
+        }
+
+        // BINA CONTAINER BARU
+        const newSection = document.createElement('div');
+        newSection.id = 'customUploadedAudioSection';
+        newSection.style.marginTop = '25px';
+        newSection.style.padding = '20px';
+        newSection.style.background = '#f0f9ff'; // Biru muda lembut
+        newSection.style.borderRadius = '12px';
+        newSection.style.border = '2px solid #bae6fd';
+        newSection.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+
+        const title = document.createElement('h3');
+        title.innerHTML = '📂 Bahan Audio Dimuat Naik (MP3/WAV)';
+        title.style.color = '#0369a1';
+        title.style.marginTop = '0';
+        title.style.borderBottom = '2px solid #bae6fd';
+        title.style.paddingBottom = '10px';
+        
+        const listContainer = document.createElement('div');
+        listContainer.id = 'audioItemsList';
+        listContainer.style.display = 'flex';
+        listContainer.style.flexDirection = 'column';
+        listContainer.style.gap = '15px';
+
+        newSection.appendChild(title);
+        newSection.appendChild(listContainer);
+
+        // SUNTIK KE DALAM HALAMAN
+        // Cuba letak selepas elemen target, atau append jika gagal
+        if (targetParent && targetParent.parentNode) {
+             targetParent.parentNode.insertBefore(newSection, targetParent.nextSibling);
+        } else {
+            document.body.appendChild(newSection);
+        }
+        
+        existingContainer = listContainer;
+    }
+
+    // RENDER ITEM
+    if (items.length === 0) {
+        existingContainer.innerHTML = '<p style="color:#666; font-style:italic; text-align:center;">Belum ada bahan audio dimuat naik.</p>';
+        return;
+    }
+
+    items.forEach(item => {
+        const card = document.createElement('div');
+        card.style.background = '#ffffff';
+        card.style.padding = '15px';
+        card.style.borderRadius = '8px';
+        card.style.border = '1px solid #e5e7eb';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.gap = '8px';
+        card.style.transition = 'transform 0.2s';
+        card.onmouseenter = () => card.style.transform = 'translateY(-2px)';
+        card.onmouseleave = () => card.style.transform = 'translateY(0)';
+
+        // Header Card
+        const headerDiv = document.createElement('div');
+        headerDiv.style.display = 'flex';
+        headerDiv.style.justifyContent = 'space-between';
+        headerDiv.style.alignItems = 'center';
+        
+        const metaTitle = document.createElement('strong');
+        metaTitle.textContent = item.topic || 'Tanpa Tajuk';
+        metaTitle.style.color = '#1f2937';
+        metaTitle.style.fontSize = '1.1rem';
+
+        const badge = document.createElement('span');
+        badge.textContent = item.category || 'Umum';
+        badge.style.background = '#dbeafe';
+        badge.style.color = '#1e40af';
+        badge.style.padding = '2px 8px';
+        badge.style.borderRadius = '12px';
+        badge.style.fontSize = '0.75rem';
+        badge.style.fontWeight = 'bold';
+
+        headerDiv.appendChild(metaTitle);
+        headerDiv.appendChild(badge);
+
+        // Description
+        const descText = document.createElement('p');
+        descText.textContent = item.description || '';
+        descText.style.margin = '0';
+        descText.style.fontSize = '0.9rem';
+        descText.style.color = '#4b5563';
+        descText.style.lineHeight = '1.4';
+
+        // Audio Player
+        const audioEl = document.createElement('audio');
+        audioEl.controls = true;
+        audioEl.src = item.audioData;
+        audioEl.style.width = '100%';
+        audioEl.style.marginTop = '5px';
+        audioEl.style.borderRadius = '4px';
+
+        // Delete Button
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '🗑️ Padam Fail';
+        delBtn.style.background = '#fee2e2';
+        delBtn.style.color = '#b91c1c';
+        delBtn.style.border = '1px solid #fecaca';
+        delBtn.style.padding = '6px 12px';
+        delBtn.style.borderRadius = '6px';
+        delBtn.style.cursor = 'pointer';
+        delBtn.style.alignSelf = 'flex-start';
+        delBtn.style.fontSize = '0.85rem';
+        delBtn.style.marginTop = '5px';
+        delBtn.onclick = () => deleteAudioItem(item.id);
+
+        card.appendChild(headerDiv);
+        card.appendChild(descText);
+        card.appendChild(audioEl);
+        card.appendChild(delBtn);
+
+        existingContainer.appendChild(card);
+    });
+}
+
+// 4. Fungsi Padam
+function deleteAudioItem(id) {
+    if(!confirm("Adakah anda pasti mahu memadam bahan audio ini?")) return;
+    
+    const transaction = dbAudio.transaction(['audioUploads'], 'readwrite');
+    const store = transaction.objectStore('audioUploads');
+    store.delete(id);
+    
+    transaction.oncomplete = () => {
+        alert("✅ Bahan audio berjaya dipadam.");
+        loadUploadedAudio(); // Refresh list
+    };
+}
+
+// Jalankan bila halaman siap
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAudioDB);
+} else {
+    initAudioDB();
+}
+
+/* --- TAMAT KOD INTEGRASI --- */
 </script>
+  <!-- WADAH PAKSAAAN UNTUK AUDIO UPLOAD -->
+<div id="forcedAudioContainer" style="width: 100%; margin: 20px 0; padding: 20px; background: #f0fdf4; border: 2px dashed #16a34a; border-radius: 10px; display: block;">
+    <h3 style="margin-top: 0; color: #15803d;">📂 Bahan Audio Dimuat Naik</h3>
+    <div id="audioListContent">Memuatkan senarai...</div>
+</div>
+<!-- TAMAT WADAH PAKSAAAN -->
 </body>
 </html>
