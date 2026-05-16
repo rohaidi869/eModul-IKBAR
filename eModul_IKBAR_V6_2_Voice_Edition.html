@@ -1288,1073 +1288,157 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { box-shadow: va
 
 <!-- SCRIPT -->
 <script>
-// ============================================
-// CONFIG
-// ============================================
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqVadyQcn9DKg8igO5JB_fU68RW2jlVewJ2S5kp905qfqT68Q2GU03x39JTebDwu6E5Q/exec';
-const STATE_KEY = 'ikbar_m1_v62';
-
-let state = { step: 0, quizScore: null, refleksi: '', output: '', nama: '', matrik: '', prosesData: { sebab: [], akibat: [] }, tarikhHantar: '', submitted: false, fontSizeLevel: 0, theme: 'light', highContrast: false, audioProgress: 0, voiceRecordings: [] };
-
-function saveState() { try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch(e) {} }
-function loadState() { try { const s = localStorage.getItem(STATE_KEY); if(s) state = { ...state, ...JSON.parse(s) }; } catch(e) {} }
-
-// ============================================
-// A11Y
-// ============================================
-function toggleTheme() {
-  const html = document.documentElement;
-  const next = (html.getAttribute('data-theme') || 'light') === 'light' ? 'dark' : 'light';
-  html.setAttribute('data-theme', next); state.theme = next; saveState();
-  toast(next === 'dark' ? 'Tema gelap diaktifkan' : 'Tema terang diaktifkan');
-}
-function adjustFontSize(delta) {
-  const html = document.documentElement;
-  const current = parseFloat(getComputedStyle(html).fontSize);
-  html.style.fontSize = Math.max(14, Math.min(22, current + delta)) + 'px';
-  state.fontSizeLevel += delta > 0 ? 1 : -1; saveState();
-}
-function toggleHighContrast() {
-  const html = document.documentElement;
-  if (html.getAttribute('data-contrast') === 'high') { html.removeAttribute('data-contrast'); state.highContrast = false; toast('Kontras standard'); }
-  else { html.setAttribute('data-contrast', 'high'); state.highContrast = true; toast('Kontras tinggi diaktifkan'); }
-  saveState();
-}
-
-// ============================================
-// TTS
-// ============================================
-function speakText(text) {
-  if (!window.speechSynthesis) { toast('Pelayar tidak menyokong TTS', true); return; }
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'ar-SA'; u.rate = 0.85; u.pitch = 1;
-  const voices = window.speechSynthesis.getVoices();
-  const arVoice = voices.find(v => v.lang.includes('ar'));
-  if (arVoice) u.voice = arVoice;
-  u.onerror = () => toast('Tidak dapat main audio TTS', true);
-  window.speechSynthesis.speak(u);
-  toast('Memainkan sebutan...');
-}
-function speakFullAyat() {
-  const fullText = 'إِنَّ الشِّرْكَ لَظُلْمٌ عَظِيمٌ. سَبَبُ الشِّرْكِ هُوَ الْجَهْلُ وَالتَّقْلِيدُ الْأَعْمَى. الْوِقَايَةُ مِنَ الشِّرْكِ بِتَعْلِيمِ التَّوْحِيدِ.';
-  speakText(fullText);
-}
-if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = () => {};
-
-// ============================================
-// AUDIO PLAYER
-// ============================================
-let audioEl = null;
-function initAudioPlayer() {
-  audioEl = document.getElementById('khutbah-audio');
-  if (!audioEl) return;
-  if (state.audioProgress > 0) audioEl.currentTime = state.audioProgress;
-  audioEl.addEventListener('timeupdate', () => {
-    if (!audioEl.duration) return;
-    const pct = (audioEl.currentTime / audioEl.duration) * 100;
-    document.getElementById('audio-fill').style.width = pct + '%';
-    document.getElementById('audio-current').textContent = fmt(audioEl.currentTime);
-    state.audioProgress = audioEl.currentTime; saveState();
-  });
-  audioEl.addEventListener('loadedmetadata', () => { document.getElementById('audio-total').textContent = fmt(audioEl.duration); });
-  audioEl.addEventListener('ended', () => {
-    document.getElementById('icon-play').style.display = 'block';
-    document.getElementById('icon-pause').style.display = 'none';
-    document.getElementById('audio-fill').style.width = '0%';
-    state.audioProgress = 0; saveState();
-    toast('Khutbah selesai ✓');
-  });
-  audioEl.addEventListener('error', () => {
-    document.getElementById('audio-fallback').style.display = 'block';
-    document.getElementById('audio-main-btn').disabled = true;
-    toast('Fail audio tidak dijumpa. Guna TTS sebagai alternatif.', true);
-  });
-}
-function toggleAudio() {
-  if (!audioEl) return;
-  const playIcon = document.getElementById('icon-play');
-  const pauseIcon = document.getElementById('icon-pause');
-  if (audioEl.paused) {
-    audioEl.play().then(() => {
-      playIcon.style.display = 'none'; pauseIcon.style.display = 'block';
-      toast('Memainkan khutbah...');
-    }).catch(() => {
-      document.getElementById('audio-fallback').style.display = 'block';
-      toast('Gagal main audio. Cuba guna TTS.', true);
-    });
-  } else {
-    audioEl.pause();
-    playIcon.style.display = 'block'; pauseIcon.style.display = 'none';
-  }
-}
-function skipAudio(seconds) {
-  if (!audioEl || !audioEl.duration) return;
-  audioEl.currentTime = Math.max(0, Math.min(audioEl.duration, audioEl.currentTime + seconds));
-}
-function seekAudio(event) {
-  if (!audioEl || !audioEl.duration) return;
-  const track = document.getElementById('audio-track');
-  const rect = track.getBoundingClientRect();
-  const pct = (event.clientX - rect.left) / rect.width;
-  audioEl.currentTime = pct * audioEl.duration;
-}
-function fmt(s) { const m = Math.floor(s / 60), sec = Math.floor(s % 60); return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0'); }
-
-// ============================================
-// VOICE RECORDER V6.2
-// ============================================
-let mediaRecorder = null;
-let audioChunks = [];
-let isRecording = false;
-let recordingStartTime = 0;
-let recordingTimer = null;
-let currentRecordingDuration = 0;
-let audioContext = null;
-let analyser = null;
-let dataArray = null;
-let visualizerInterval = null;
-
-function initVoiceRecorder() {
-  // Create waveform bars
-  const waveform = document.getElementById('voice-waveform');
-  if (!waveform) return;
-  waveform.innerHTML = '';
-  for (let i = 0; i < 20; i++) {
-    const bar = document.createElement('div');
-    bar.className = 'voice-bar';
-    bar.style.height = '8px';
-    bar.style.animationDelay = (i * 0.05) + 's';
-    waveform.appendChild(bar);
-  }
-  renderVoiceRecordingsList();
-}
-
-async function toggleVoiceRecording() {
-  const btn = document.getElementById('voice-record-btn');
-  const timerEl = document.getElementById('voice-timer');
-  const statusEl = document.getElementById('voice-status');
-
-  if (!isRecording) {
-    // Start recording
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      // Setup visualizer
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioContext.createAnalyser();
-      const source = audioContext.createMediaStreamSource(stream);
-      source.connect(analyser);
-      analyser.fftSize = 64;
-      dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-      mediaRecorder = new MediaRecorder(stream);
-      audioChunks = [];
-
-      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunks, { type: 'audio/webm' });
-        const url = URL.createObjectURL(blob);
-        const recording = {
-          id: Date.now(),
-          url: url,
-          blob: blob,
-          duration: currentRecordingDuration,
-          date: new Date().toLocaleString('ms-MY'),
-          name: 'Rakaman ' + (state.voiceRecordings.length + 1)
-        };
-        state.voiceRecordings.push(recording);
-        saveState();
-        renderVoiceRecordingsList();
-        toast('Rakaman berjaya disimpan!');
-
-        // Stop all tracks
-        stream.getTracks().forEach(t => t.stop());
-        if (audioContext) { audioContext.close(); audioContext = null; }
-        stopVisualizer();
-      };
-
-      mediaRecorder.start();
-      isRecording = true;
-      recordingStartTime = Date.now();
-      currentRecordingDuration = 0;
-
-      btn.classList.add('recording');
-      statusEl.textContent = 'Sedang merakam...';
-      statusEl.classList.add('recording');
-
-      // Start timer
-      recordingTimer = setInterval(() => {
-        currentRecordingDuration = Math.floor((Date.now() - recordingStartTime) / 1000);
-        timerEl.textContent = fmt(currentRecordingDuration);
-      }, 1000);
-
-      // Start visualizer
-      startVisualizer();
-
-      toast('Merekod... tekan butang semula untuk berhenti');
-
-    } catch (err) {
-      toast('Tidak dapat akses mikrofon. Pastikan kebenaran diberi.', true);
-      console.error('Recording error:', err);
-    }
-
-  } else {
-    // Stop recording
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
-    }
-    isRecording = false;
-    btn.classList.remove('recording');
-    statusEl.textContent = 'Rakaman selesai';
-    statusEl.classList.remove('recording');
-    clearInterval(recordingTimer);
-    stopVisualizer();
-  }
-}
-
-function startVisualizer() {
-  const bars = document.querySelectorAll('.voice-bar');
-  bars.forEach(b => b.classList.add('active'));
-
-  visualizerInterval = setInterval(() => {
-    if (!analyser) return;
-    analyser.getByteFrequencyData(dataArray);
-    bars.forEach((bar, i) => {
-      const value = dataArray[i % dataArray.length];
-      const height = Math.max(8, (value / 255) * 45);
-      bar.style.height = height + 'px';
-    });
-  }, 50);
-}
-
-function stopVisualizer() {
-  if (visualizerInterval) { clearInterval(visualizerInterval); visualizerInterval = null; }
-  const bars = document.querySelectorAll('.voice-bar');
-  bars.forEach(b => { b.classList.remove('active'); b.style.height = '8px'; });
-}
-
-function renderVoiceRecordingsList() {
-  const container = document.getElementById('voice-recordings-list');
-  if (!container) return;
-
-  if (state.voiceRecordings.length === 0) {
-    container.innerHTML = '<p style="font-size:var(--text-xs);color:var(--stone-400);text-align:center;">(Tiada rakaman lagi. Tekan 🎤 untuk mula)</p>';
-    return;
-  }
-
-  container.innerHTML = '<p style="font-size:var(--text-xs);font-weight:700;color:var(--stone-500);text-transform:uppercase;letter-spacing:0.07em;margin:0;">Senarai Rakaman</p>';
-
-  state.voiceRecordings.forEach((rec, index) => {
-    const item = document.createElement('div');
-    item.className = 'voice-recording-item';
-    item.innerHTML = `
-      <span class="rec-name">${rec.name}</span>
-      <span class="rec-time">${fmt(rec.duration)}</span>
-      <div class="rec-actions">
-        <button class="rec-btn play-btn" onclick="playVoiceRecording(${index}, this)" title="Main" aria-label="Main rakaman ${rec.name}">▶</button>
-        <button class="rec-btn delete-btn" onclick="deleteVoiceRecording(${index})" title="Padam" aria-label="Padam rakaman ${rec.name}">🗑</button>
-      </div>
-    `;
-    container.appendChild(item);
-  });
-}
-
-let currentPlayingAudio = null;
-let currentPlayingBtn = null;
-
-function playVoiceRecording(index, btn) {
-  const rec = state.voiceRecordings[index];
-  if (!rec) return;
-
-  // Stop current playing
-  if (currentPlayingAudio) {
-    currentPlayingAudio.pause();
-    currentPlayingAudio = null;
-  }
-  if (currentPlayingBtn) {
-    currentPlayingBtn.classList.remove('playing');
-    currentPlayingBtn.innerHTML = '▶';
-  }
-
-  // If clicking same button that's playing, just stop
-  if (currentPlayingBtn === btn) {
-    currentPlayingBtn = null;
-    return;
-  }
-
-  // Play new
-  const audio = new Audio(rec.url);
-  audio.play();
-  currentPlayingAudio = audio;
-  currentPlayingBtn = btn;
-  btn.classList.add('playing');
-  btn.innerHTML = '⏸';
-
-  audio.onended = () => {
-    btn.classList.remove('playing');
-    btn.innerHTML = '▶';
-    currentPlayingAudio = null;
-    currentPlayingBtn = null;
-  };
-}
-
-function deleteVoiceRecording(index) {
-  if (!confirm('Padam rakaman ini?')) return;
-  const rec = state.voiceRecordings[index];
-  if (rec && rec.url) URL.revokeObjectURL(rec.url);
-  state.voiceRecordings.splice(index, 1);
-  saveState();
-  renderVoiceRecordingsList();
-  toast('Rakaman dipadam');
-}
-
-// ============================================
-// TOAST
-// ============================================
-function toast(msg, isError) {
-  const container = document.getElementById('toast-container');
-  const toastEl = document.createElement('div');
-  toastEl.className = 'toast' + (isError ? ' error' : '');
-  toastEl.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${isError ? '#EF4444' : '#10B981'};flex-shrink:0;margin-top:4px;" aria-hidden="true"></span><span>${msg}</span>`;
-  container.appendChild(toastEl);
-  toastEl.offsetHeight;
-  toastEl.classList.add('show');
-  setTimeout(() => { toastEl.classList.remove('show'); setTimeout(() => toastEl.remove(), 300); }, isError ? 4000 : 2800);
-}
-
-// ============================================
-// GATE
-// ============================================
-function dismissGate() {
-  const namaEl = document.getElementById('gate-nama');
-  const matrikEl = document.getElementById('gate-matrik');
-  const nama = namaEl ? namaEl.value.trim() : '';
-  const matrik = matrikEl ? matrikEl.value.trim() : '';
-  let valid = true;
-  if (!nama) { namaEl.classList.add('error'); document.getElementById('gate-nama-err').style.display = 'block'; valid = false; }
-  else { namaEl.classList.remove('error'); document.getElementById('gate-nama-err').style.display = 'none'; }
-  if (!matrik) { matrikEl.classList.add('error'); document.getElementById('gate-matrik-err').style.display = 'block'; valid = false; }
-  else { matrikEl.classList.remove('error'); document.getElementById('gate-matrik-err').style.display = 'none'; }
-  if (!valid) return;
-  state.nama = nama; state.matrik = matrik; saveState();
-  document.getElementById('gate-modal').style.display = 'none';
-  localStorage.setItem('ikbarGateSeen62', '1');
-  if (!localStorage.getItem('ikbarTourSeen62')) setTimeout(startTour, 600);
-}
-
-// ============================================
-// MODAL
-// ============================================
-function openModal(n) {
-  const el = document.getElementById('modal-' + n);
-  if (el) { el.classList.add('active'); document.body.style.overflow = 'hidden'; const f = el.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'); if (f) f.focus(); }
-}
-function closeModal(n) {
-  const el = document.getElementById('modal-' + n);
-  if (el) { el.classList.remove('active'); document.body.style.overflow = ''; }
-}
-function initModalBackdrops() {
-  document.querySelectorAll('.dialog-overlay').forEach(o => {
-    o.addEventListener('click', e => { if (e.target === o) { o.classList.remove('active'); document.body.style.overflow = ''; } });
-  });
-}
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.dialog-overlay.active').forEach(m => { m.classList.remove('active'); document.body.style.overflow = ''; });
-    closeTour(); closeHelp();
-  }
-});
-
-// ============================================
-// NAV
-// ============================================
-function handleNav(step) {
-  const card = document.getElementById('card-' + step);
-  if (card.classList.contains('locked')) {
-    const labels = ['', 'INPUT', 'PROSES KBAT', 'OUTPUT', 'REFLEKSI RABBANI'];
-    toast('Langkah ' + step + ' masih terkunci. Sila selesaikan ' + labels[step - 1] + ' terlebih dahulu.', true);
-    return;
-  }
-  openModal(step);
-}
-function applyUnlock() {
-  const unlock = state.step + 1;
-  for (let i = 1; i <= 4; i++) {
-    const card = document.getElementById('card-' + i);
-    if (!card) continue;
-    if (i <= unlock) { card.classList.remove('locked'); card.setAttribute('aria-disabled', 'false'); }
-    else { card.classList.add('locked'); card.setAttribute('aria-disabled', 'true'); }
-  }
-  for (let i = 1; i <= state.step; i++) { const card = document.getElementById('card-' + i); if (card) card.classList.add('completed'); }
-}
-function updateProgressDisplay() {
-  const pct = state.step * 25;
-  document.getElementById('prog-pct').textContent = pct + '%';
-  const circle = document.getElementById('prog-ring-fill');
-  if (circle) { const c = 2 * Math.PI * 26; circle.style.strokeDashoffset = c - (pct / 100) * c; }
-  document.querySelectorAll('#step-dots .step-dot').forEach((d, i) => { d.classList.toggle('active', i < state.step); });
-  const dotsContainer = document.getElementById('step-dots');
-  if (dotsContainer) dotsContainer.setAttribute('aria-valuenow', state.step);
-  const statuses = ['Belum Mula', 'INPUT Selesai', 'PROSES Selesai', 'OUTPUT Dihantar', 'Modul Selesai!'];
-  document.getElementById('dash-status').textContent = statuses[state.step] || 'Belum Mula';
-}
-
-// ============================================
-// COMPLETE STEP
-// ============================================
-function completeStep(step) {
-  if (step === 2) {
-    const sebab = document.getElementById('drop-sebab');
-    const akibat = document.getElementById('drop-akibat');
-    if (sebab.querySelectorAll('.drag-chip').length < 1 || akibat.querySelectorAll('.drag-chip').length < 1) {
-      toast('Belum lengkap! Sila seret atau tekan sekurang-kurangnya 1 kad ke ruangan SEBAB dan 1 kad ke ruangan AKIBAT.', true);
-      return;
-    }
-    state.prosesData.sebab = [...sebab.querySelectorAll('.drag-chip')].map(c => c.innerText.trim());
-    state.prosesData.akibat = [...akibat.querySelectorAll('.drag-chip')].map(c => c.innerText.trim());
-  }
-  if (step === 3) return;
-  if (step === 4) {
-    const val = document.getElementById('refleksi-textarea').value.trim();
-    if (val.length < 5) {
-      document.getElementById('refleksi-error').style.display = 'block';
-      document.getElementById('refleksi-textarea').style.borderColor = 'var(--error-500)';
-      toast('Refleksi terlalu pendek. Minimum 5 aksara.', true); return;
-    }
-    document.getElementById('refleksi-error').style.display = 'none';
-    document.getElementById('refleksi-textarea').style.borderColor = 'var(--stone-200)';
-    state.refleksi = val;
-    state.tarikhHantar = new Date().toLocaleString('ms-MY', { timeZone: 'Asia/Kuala_Lumpur' });
-    document.getElementById('refleksi-preview').textContent = val.length > 60 ? val.slice(0, 60) + '…' : val;
-    saveState();
-  }
-  if (step > state.step) state.step = step;
-  saveState(); applyUnlock(); updateProgressDisplay(); closeModal(step);
-  const msgs = ['', 'INPUT selesai! PROSES KBAT kini dibuka.', 'Peta sebab-akibat disimpan! OUTPUT kini dibuka.', '', 'Refleksi disimpan! Tahniah, modul selesai!'];
-  toast(msgs[step] || 'Selesai!');
-  if (step === 4) {
-    setTimeout(() => { document.getElementById('final-quiz-score').textContent = state.quizScore || 'N/A'; openModal('complete'); submitToGoogleDrive(); }, 700);
-  }
-}
-
-// ============================================
-// RESET
-// ============================================
-function resetProgress() {
-  if (!confirm('Reset semua kemajuan? Semua data akan dipadam.')) return;
-  try { localStorage.removeItem(STATE_KEY); } catch(e) {}
-  state = { step: 0, quizScore: null, refleksi: '', output: '', nama: state.nama, matrik: state.matrik, prosesData: { sebab: [], akibat: [] }, tarikhHantar: '', submitted: false, audioProgress: 0, voiceRecordings: [] };
-  const tulis = document.getElementById('tulis-text'); if (tulis) { tulis.value = ''; updateWordCount(); }
-  const refTA = document.getElementById('refleksi-textarea'); if (refTA) refTA.value = '';
-  document.getElementById('refleksi-preview').textContent = '(Belum ada refleksi)';
-  document.getElementById('refleksi-error').style.display = 'none';
-  clearZones();
-  document.querySelectorAll('.nav-card').forEach(c => c.classList.remove('completed'));
-  applyUnlock(); updateProgressDisplay();
-  quizRendered = false; quizAnswered = [];
-  if (state.voiceRecordings) {
-    state.voiceRecordings.forEach(r => { if (r.url) URL.revokeObjectURL(r.url); });
-  }
-  toast('Kemajuan telah direset.');
-}
-
-// ============================================
-// DRAG DROP
-// ============================================
-let selectedChip = null;
-let draggedEl = null;
-function tapSelect(chip) {
-  if (window.matchMedia('(pointer:fine)').matches && !isTouchDevice()) return;
-  if (selectedChip && selectedChip !== chip) selectedChip.classList.remove('tap-selected');
-  if (selectedChip === chip) { chip.classList.remove('tap-selected'); selectedChip = null; }
-  else { chip.classList.add('tap-selected'); selectedChip = chip; toast('Kad dipilih. Tekan ruangan untuk letak.'); }
-}
-function tapDrop(zoneId) {
-  if (!selectedChip) return;
-  const zone = document.getElementById(zoneId);
-  if (zone) { zone.appendChild(selectedChip); selectedChip.classList.remove('tap-selected'); selectedChip = null; zone.style.transform = 'scale(1.02)'; setTimeout(() => zone.style.transform = '', 150); }
-}
-function isTouchDevice() { return 'ontouchstart' in window || navigator.maxTouchPoints > 0; }
-function initDragDrop() {
-  document.querySelectorAll('.drag-chip').forEach(el => {
-    el.addEventListener('dragstart', e => { draggedEl = el; setTimeout(() => el.classList.add('dragging'), 0); });
-    el.addEventListener('dragend', e => { el.classList.remove('dragging'); draggedEl = null; });
-  });
-  ['drag-pool', 'drop-sebab', 'drop-akibat'].forEach(id => {
-    const zone = document.getElementById(id);
-    if (!zone) return;
-    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); if (draggedEl) zone.appendChild(draggedEl); });
-  });
-  if (isTouchDevice()) { const mh = document.getElementById('hint-text-mobile'), dh = document.getElementById('hint-text-desktop'); if (mh) mh.style.display = 'inline'; if (dh) dh.style.display = 'none'; }
-}
-function clearZones() {
-  const pool = document.getElementById('drag-pool');
-  ['drop-sebab', 'drop-akibat'].forEach(id => { const z = document.getElementById(id); if (z && pool) [...z.querySelectorAll('.drag-chip')].forEach(c => pool.appendChild(c)); });
-  if (selectedChip) { selectedChip.classList.remove('tap-selected'); selectedChip = null; }
-  toast('Semua kad telah dipulangkan ke kolam.');
-}
-
-// ============================================
-// TOOLTIP
-// ============================================
-function toggleTip(el) {
-  const wasActive = el.classList.contains('tip-active');
-  document.querySelectorAll('.word-tooltip.tip-active').forEach(t => t.classList.remove('tip-active'));
-  if (!wasActive) el.classList.add('tip-active');
-}
-document.addEventListener('click', e => { if (!e.target.closest('.word-tooltip')) document.querySelectorAll('.word-tooltip.tip-active').forEach(t => t.classList.remove('tip-active')); });
-
-// ============================================
-// HINT
-// ============================================
-function toggleHint() {
-  const box = document.getElementById('hint-box');
-  const btn = document.getElementById('hint-toggle-btn');
-  const isOpen = box.style.display !== 'none';
-  box.style.display = isOpen ? 'none' : 'block';
-  btn.setAttribute('aria-expanded', !isOpen);
-}
-
-// ============================================
-// TABS
-// ============================================
-let currentTab = 'tulis';
-function switchTab(tab) {
-  currentTab = tab;
-  document.getElementById('panel-tulis').style.display = tab === 'tulis' ? 'block' : 'none';
-  document.getElementById('panel-kuiz').style.display = tab === 'kuiz' ? 'block' : 'none';
-  document.getElementById('panel-voice').style.display = tab === 'voice' ? 'block' : 'none';
-  document.getElementById('footer-tulis').style.display = tab === 'tulis' ? 'block' : 'none';
-  document.getElementById('footer-kuiz').style.display = tab === 'kuiz' ? 'block' : 'none';
-  document.getElementById('footer-voice').style.display = tab === 'voice' ? 'block' : 'none';
-
-  const tTulis = document.getElementById('tab-tulis'), tKuiz = document.getElementById('tab-kuiz'), tVoice = document.getElementById('tab-voice');
-
-  [tTulis, tKuiz, tVoice].forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
-
-  if (tab === 'tulis') { tTulis.classList.add('active'); tTulis.setAttribute('aria-selected', 'true'); }
-  else if (tab === 'kuiz') { tKuiz.classList.add('active'); tKuiz.setAttribute('aria-selected', 'true'); renderQuiz(); }
-  else if (tab === 'voice') { tVoice.classList.add('active'); tVoice.setAttribute('aria-selected', 'true'); initVoiceRecorder(); }
-}
-function updateWordCount() {
-  const text = document.getElementById('tulis-text').value.trim();
-  const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
-  document.getElementById('wc').textContent = words;
-  document.getElementById('word-count-badge').style.background = words >= 10 ? 'var(--success-500)' : 'var(--stone-900)';
-}
-
-// ============================================
-// QUIZ
-// ============================================
-const quizData = [
-  { q: 'Apakah makna الشِّرْكُ?', opts: ['Syirik / Menyekutukan Allah', 'Solat', 'Sedekah', 'Zakat'], ans: 0 },
-  { q: 'Terjemahan betul untuk لَظُلْمٌ عَظِيمٌ ialah:', opts: ['Dosa yang kecil', 'Kezaliman yang amat besar', 'Perbuatan yang baik', 'Amalan yang mulia'], ans: 1 },
-  { q: 'Sebab utama syirik menurut khutbah ini ialah:', opts: ['Kemiskinan', 'الجَهْلُ (kejahilan) dan taklid buta', 'Kekayaan berlebihan', 'Terlalu sibuk'], ans: 1 },
-  { q: 'Cara pencegahan syirik yang disebutkan ialah:', opts: ['Banyakkan solat sahaja', 'Elakkan orang ramai', 'Pengajaran tauhid — تَعْلِيمُ التَّوْحِيدِ', 'Berpuasa setiap hari'], ans: 2 },
-  { q: 'Dalil utama diambil dari:', opts: ['Al-Baqarah: 255', 'Luqman: 13', 'Al-Ikhlas: 1', 'Al-Fatihah: 5'], ans: 1 }
-];
-let quizAnswered = [], quizScore = 0, quizRendered = false;
-function renderQuiz() {
-  if (quizRendered) return;
-  quizRendered = true; quizAnswered = new Array(quizData.length).fill(false); quizScore = 0;
-  const container = document.getElementById('quiz-container');
-  container.innerHTML = '';
-  quizData.forEach((q, qi) => {
-    const d = document.createElement('div');
-    d.style.cssText = 'margin-bottom:var(--space-5);';
-    d.innerHTML = `<p style="font-size:var(--text-sm);font-weight:600;color:var(--stone-900);margin:0 0 var(--space-3);">${qi + 1}. ${q.q}</p><div id="opts-${qi}" style="display:flex;flex-direction:column;gap:8px;" role="radiogroup" aria-label="Soalan ${qi + 1}"></div><p id="feedback-${qi}" style="font-size:var(--text-xs);margin:6px 0 0;display:none;padding:6px 10px;border-radius:var(--radius-md);" role="status" aria-live="polite"></p>`;
-    container.appendChild(d);
-    const opts = d.querySelector('#opts-' + qi);
-    q.opts.forEach((opt, oi) => {
-      const btn = document.createElement('button');
-      btn.className = 'quiz-option'; btn.setAttribute('role', 'radio'); btn.setAttribute('aria-checked', 'false');
-      btn.innerHTML = `<span style="width:24px;height:24px;border-radius:50%;border:2px solid var(--stone-300);display:flex;align-items:center;justify-content:center;font-size:var(--text-xs);font-weight:700;flex-shrink:0;">${String.fromCharCode(65 + oi)}</span>${opt}`;
-      btn.onclick = () => selectAnswer(qi, oi, btn);
-      opts.appendChild(btn);
-    });
-  });
-}
-function selectAnswer(qi, oi, btn) {
-  if (quizAnswered[qi]) return;
-  quizAnswered[qi] = true;
-  const opts = document.getElementById('opts-' + qi);
-  const fb = document.getElementById('feedback-' + qi);
-  opts.querySelectorAll('.quiz-option').forEach(b => { b.disabled = true; b.setAttribute('aria-disabled', 'true'); });
-  if (oi === quizData[qi].ans) {
-    btn.classList.add('correct'); btn.setAttribute('aria-checked', 'true'); quizScore++;
-    fb.textContent = '✓ Betul! Jawapan yang tepat.';
-    fb.style.cssText = 'font-size:var(--text-xs);margin:6px 0 0;display:block;padding:6px 10px;border-radius:var(--radius-md);background:var(--success-50);color:var(--success-600);';
-  } else {
-    btn.classList.add('wrong');
-    const correctBtn = opts.querySelectorAll('.quiz-option')[quizData[qi].ans];
-    correctBtn.classList.add('correct'); correctBtn.setAttribute('aria-checked', 'true');
-    fb.textContent = '✗ Tidak tepat. Jawapan betul: ' + quizData[qi].opts[quizData[qi].ans];
-    fb.style.cssText = 'font-size:var(--text-xs);margin:6px 0 0;display:block;padding:6px 10px;border-radius:var(--radius-md);background:var(--error-50);color:var(--error-600);';
-  }
-  if (quizAnswered.every(Boolean)) {
-    document.getElementById('quiz-result').style.display = 'block';
-    const pct = Math.round((quizScore / quizData.length) * 100);
-    document.getElementById('quiz-score-text').textContent = `Skor: ${quizScore} / ${quizData.length} (${pct}%)`;
-    const fb2 = pct >= 80 ? 'Cemerlang! Anda bersedia untuk Refleksi Rabbani.' : pct >= 60 ? 'Baik! Cuba ulangkaji kosa kata yang salah.' : 'Teruskan usaha. Kembali ke INPUT dan ulangkaji semula.';
-    document.getElementById('quiz-feedback-text').textContent = fb2;
-    state.quizScore = quizScore + '/' + quizData.length; saveState();
-  }
-}
-
-function handleOutputSubmit() {
-  if (currentTab === 'tulis') {
-    const text = document.getElementById('tulis-text').value.trim();
-    if (text.length < 10) { toast('Teks terlalu pendek. Minimum 10 aksara.', true); return; }
-    state.output = text; saveState(); completeStepOutput();
-  } else if (currentTab === 'kuiz') {
-    if (!quizAnswered.every(Boolean)) { toast('Kuiz belum selesai. Sila jawab semua 5 soalan.', true); return; }
-    completeStepOutput();
-  } else if (currentTab === 'voice') {
-    // Check if there's at least one recording with minimum 10 seconds
-    const validRecordings = state.voiceRecordings.filter(r => r.duration >= 10);
-    if (validRecordings.length === 0) {
-      toast('Sila rakam ucapan minimum 10 saat untuk hantar.', true);
-      return;
-    }
-    completeStepOutput();
-  }
-}
-
-function completeStepOutput() {
-  if (state.step < 3) state.step = 3;
-  saveState(); applyUnlock(); updateProgressDisplay(); closeModal(3);
-  toast('OUTPUT dihantar! REFLEKSI RABBANI kini dibuka.');
-  setTimeout(() => openModal(4), 500);
-}
-
-// ============================================
-// QUICK PHRASES
-// ============================================
-function insertPhrase(btn) {
-  const ta = document.getElementById('refleksi-textarea');
-  if (!ta) return;
-  const phrase = btn.getAttribute('data-phrase') || '';
-  const start = ta.selectionStart, end = ta.selectionEnd, text = ta.value;
-  ta.value = text.substring(0, start) + phrase + text.substring(end);
-  ta.focus(); ta.setSelectionRange(start + phrase.length, start + phrase.length);
-  document.getElementById('refleksi-error').style.display = 'none';
-}
-
-// ============================================
-// HELP
-// ============================================
-function openHelp() { document.getElementById('help-panel').classList.add('active'); document.getElementById('help-bg').classList.add('active'); document.body.style.overflow = 'hidden'; }
-function closeHelp() { document.getElementById('help-panel').classList.remove('active'); document.getElementById('help-bg').classList.remove('active'); document.body.style.overflow = ''; }
-
-// ============================================
-// FAQ
-// ============================================
-const faqData = [
-  { q: 'Kenapa butang seterusnya tidak aktif?', a: 'Setiap langkah perlu diselesaikan dahulu. Pastikan anda menekan butang "Tandai Selesai" dalam setiap langkah.' },
-  { q: 'Bolehkah saya kembali ke langkah sebelum ini?', a: 'Ya. Tekan kad langkah yang sudah selesai pada halaman utama untuk buka semula.' },
-  { q: 'Apakah yang berlaku jika saya tutup browser?', a: 'Kemajuan anda disimpan secara automatik dalam peranti ini. Gunakan fungsi Export untuk simpan fail JSON.' },
-  { q: 'Bagaimana cara guna drag-drop pada telefon?', a: 'Tekan kad untuk pilih (ia akan bertukar warna), kemudian tekan ruangan SEBAB atau AKIBAT untuk letak kad.' },
-  { q: 'Bolehkah saya tulis campuran Arab dan Melayu?', a: 'Ya. Semua aktiviti membenarkan campuran bahasa, terutama Refleksi Rabbani.' },
-  { q: 'Bagaimana untuk dengar sebutan Arab?', a: 'Tekan ikon 🔊 pada setiap perkataan atau kad kosa kata untuk dengar sebutan. Guna butang main besar untuk dengar khutbah penuh.' },
-  { q: 'Adakah rakaman suara saya disimpan?', a: 'Ya, rakaman disimpan dalam peranti ini. Anda boleh main balik, padam, atau hantar ke Google Drive pensyarah.' }
-];
-function renderFAQ() {
-  const list = document.getElementById('faq-list');
-  if (!list) return;
-  faqData.forEach((item, i) => {
-    const div = document.createElement('div');
-    div.className = 'faq-item';
-    div.innerHTML = `<button class="faq-btn" onclick="toggleFaq(${i})" aria-expanded="false" aria-controls="faq-ans-${i}" id="faq-q-${i}"><span>${item.q}</span><span class="faq-icon" aria-hidden="true">+</span></button><div id="faq-ans-${i}" class="faq-ans" role="region" aria-labelledby="faq-q-${i}">${item.a}</div>`;
-    list.appendChild(div);
-  });
-}
-function toggleFaq(i) {
-  const ans = document.getElementById('faq-ans-' + i);
-  const btn = document.getElementById('faq-q-' + i);
-  const icon = btn.querySelector('.faq-icon');
-  const isOpen = ans.classList.contains('open');
-  document.querySelectorAll('.faq-ans.open').forEach(el => {
-    if (el.id !== 'faq-ans-' + i) { el.classList.remove('open'); el.previousElementSibling.setAttribute('aria-expanded', 'false'); el.previousElementSibling.querySelector('.faq-icon').textContent = '+'; }
-  });
-  if (isOpen) { ans.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); icon.textContent = '+'; }
-  else { ans.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); icon.textContent = '−'; }
-}
-
-// ============================================
-// EXPORT / IMPORT
-// ============================================
-function exportProgress() {
-  // Note: voice recordings can't be exported as JSON (blobs too large)
-  // Export metadata only
-  const exportData = { version: 'ikbar_v62', exported: new Date().toISOString(), state: { ...state, voiceRecordings: state.voiceRecordings.map(r => ({ ...r, url: null, blob: null })) } };
-  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'ikbar_kemajuan_' + new Date().toISOString().slice(0, 10) + '.json';
-  a.click(); URL.revokeObjectURL(url);
-  toast('Kemajuan berjaya dieksport (nota: rakaman audio tidak termasuk).');
-}
-function importProgress(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data.version && data.state) {
-        state = { ...state, ...data.state, voiceRecordings: state.voiceRecordings };
-        saveState(); applyUnlock(); updateProgressDisplay();
-        if (state.refleksi) { const p = state.refleksi.length > 60 ? state.refleksi.slice(0, 60) + '…' : state.refleksi; document.getElementById('refleksi-preview').textContent = p; }
-        closeHelp(); toast('Kemajuan berjaya diimport (rakaman audio kekal).');
-      } else { toast('Format fail tidak sah.', true); }
-    } catch (err) { toast('Ralat membaca fail.', true); }
-  };
-  reader.readAsText(file); event.target.value = '';
-}
-
-// ============================================
-// TOUR
-// ============================================
-const tourSteps = [
-  { title: 'Selamat datang ke eModul IKBAR V6.2!', body: 'Versi Voice Edition kini dengan latihan bertutur. Tekan Seterusnya.', targetId: null, pos: 'center' },
-  { title: 'Butang Bantuan (?)', body: 'Tekan butang ini pada bila-bila masa untuk buka Pusat Bantuan, FAQ, dan fungsi simpan/muat kemajuan.', targetId: 'btn-help', pos: 'below' },
-  { title: 'Kad Langkah Pembelajaran', body: 'Terdapat 4 langkah. Setiap langkah mesti diselesaikan mengikut urutan. Kad kelabu = terkunci.', targetId: 'nav-grid', pos: 'above' },
-  { title: 'Papan Kemajuan', body: 'Menunjukkan status semasa, kemahiran KBAT, dan refleksi terakhir anda.', targetId: 'prog-card', pos: 'below' },
-  { title: 'Mula dengan INPUT!', body: 'Tekan kad INPUT (No.1) untuk dengar khutbah dan mulakan pembelajaran. Selamat belajar!', targetId: 'card-1', pos: 'above' }
-];
-let tourIndex = 0;
-function startTour() { tourIndex = 0; document.getElementById('tour-overlay').classList.add('active'); showTourStep(); }
-function showTourStep() {
-  const step = tourSteps[tourIndex];
-  const bubble = document.getElementById('tour-bubble');
-  document.getElementById('tour-step-label').textContent = 'Langkah ' + (tourIndex + 1) + ' / ' + tourSteps.length;
-  document.getElementById('tour-title').textContent = step.title;
-  document.getElementById('tour-body').textContent = step.body;
-  document.getElementById('tour-next-btn').textContent = tourIndex === tourSteps.length - 1 ? 'Mula Sekarang ✓' : 'Seterusnya →';
-  bubble.className = 'tour-bubble';
-  if (step.targetId) {
-    const target = document.getElementById(step.targetId);
-    if (target) {
-      target.classList.add('tour-highlight');
-      const rect = target.getBoundingClientRect();
-      if (step.pos === 'below') { bubble.style.cssText = `top:${Math.min(rect.bottom + 16, window.innerHeight - 220)}px;left:${Math.max(16, Math.min(rect.left, window.innerWidth - 380))}px;display:block;`; bubble.classList.add('arrow-top'); }
-      else { bubble.style.cssText = `top:${Math.max(16, rect.top - 20)}px;left:${Math.max(16, Math.min(rect.left, window.innerWidth - 380))}px;transform:translateY(-100%);display:block;`; bubble.classList.add('arrow-bottom'); }
-    } else { centerBubble(); }
-  } else { centerBubble(); }
-}
-function centerBubble() { const bubble = document.getElementById('tour-bubble'); bubble.style.cssText = `top:50%;left:50%;transform:translate(-50%,-50%);display:block;`; }
-function clearTourHighlights() { document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight')); }
-function nextTour() { clearTourHighlights(); tourIndex++; if (tourIndex >= tourSteps.length) { closeTour(); return; } showTourStep(); }
-function skipTour() { clearTourHighlights(); closeTour(); }
-function closeTour() { clearTourHighlights(); document.getElementById('tour-overlay').classList.remove('active'); document.getElementById('tour-bubble').style.display = 'none'; localStorage.setItem('ikbarTourSeen62', '1'); }
-
-// ============================================
-// GOOGLE DRIVE
-// ============================================
-function buildSubmissionPayload() {
-  return {
-    tarikhHantar: state.tarikhHantar || new Date().toLocaleString('ms-MY', { timeZone: 'Asia/Kuala_Lumpur' }),
-    nama: state.nama || '(Tiada nama)', matrik: state.matrik || '(Tiada matrik)',
-    modul: 'Tahap 2 Minggu 4: Syirik',
-    input: 'INPUT selesai — pelajar telah dengar audio khutbah dan membaca teks.',
-    prosesSebab: (state.prosesData.sebab || []).join(' | ') || '(Tiada data)',
-    prosesAkibat: (state.prosesData.akibat || []).join(' | ') || '(Tiada data)',
-    output: state.output || '(Tiada output teks)',
-    quizScore: state.quizScore || 'N/A',
-    voiceRecordings: state.voiceRecordings.length + ' rakaman',
-    refleksi: state.refleksi || '(Tiada refleksi)'
-  };
-}
-function setDriveStatus(type, msg) {
-  const box = document.getElementById('drive-status-box');
-  const icon = document.getElementById('drive-status-icon');
-  const text = document.getElementById('drive-status-text');
-  const retryBtn = document.getElementById('btn-retry-drive');
-  if (!box) return;
-  const styles = {
-    loading: { bg: 'var(--warning-50)', border: 'var(--warning-500)', color: 'var(--warning-600)', icon: '⏳' },
-    success: { bg: 'var(--success-50)', border: 'var(--success-500)', color: 'var(--success-600)', icon: '✅' },
-    error: { bg: 'var(--error-50)', border: 'var(--error-500)', color: 'var(--error-600)', icon: '⚠️' },
-    offline: { bg: 'var(--stone-100)', border: 'var(--stone-300)', color: 'var(--stone-600)', icon: '📶' }
-  };
-  const s = styles[type] || styles.loading;
-  box.style.background = s.bg; box.style.borderColor = s.border; box.style.color = s.color;
-  icon.textContent = s.icon; text.textContent = msg;
-  if (retryBtn) retryBtn.style.display = (type === 'error' || type === 'offline') ? 'flex' : 'none';
-}
-async function submitToGoogleDrive() {
-  if (!navigator.onLine) { setDriveStatus('offline', 'Tiada internet. Rekod disimpan sementara.'); localStorage.setItem('ikbar_pending_submission', JSON.stringify(buildSubmissionPayload())); return; }
-  if (APPS_SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') { setDriveStatus('error', 'URL Google Apps Script belum dikonfigurasi.'); return; }
-  setDriveStatus('loading', 'Menghantar ke Google Drive pensyarah...');
-  try {
-    await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(buildSubmissionPayload()) });
-    state.submitted = true; saveState(); setDriveStatus('success', 'Berjaya dihantar ke Google Drive! ✓');
-    localStorage.removeItem('ikbar_pending_submission');
-  } catch (err) { setDriveStatus('error', 'Gagal dihantar. Cuba hantar semula.'); localStorage.setItem('ikbar_pending_submission', JSON.stringify(buildSubmissionPayload())); }
-}
-function retrySubmission() { submitToGoogleDrive(); }
-function checkPendingQueue() {
-  const pending = localStorage.getItem('ikbar_pending_submission');
-  if (pending && navigator.onLine && APPS_SCRIPT_URL !== 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
-    fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: pending })
-      .then(() => { localStorage.removeItem('ikbar_pending_submission'); toast('Rekod tertangguh berjaya dihantar.'); }).catch(() => {});
-  }
-}
-
-// ============================================
-// SAVE PDF
-// ============================================
-function savePDF() {
-  const s = state;
-  const prosesText = ['<b>SEBAB:</b> ' + ((s.prosesData.sebab || []).join(', ') || '(Tiada)'), '<b>AKIBAT:</b> ' + ((s.prosesData.akibat || []).join(', ') || '(Tiada)')].join('<br>');
-  const printWin = window.open('', '_blank', 'width=800,height=900');
-  printWin.document.write(`<!DOCTYPE html><html lang="ms"><head><meta charset="UTF-8"><title>Rekod eModul IKBAR — ${s.nama || ''}</title><style>@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Naskh+Arabic:wght@400;700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1C1917;padding:40px;font-size:13px;line-height:1.7;}.ar{font-family:'Noto Naskh Arabic',serif;direction:rtl;font-size:1.3em;}h1{font-size:20px;font-weight:800;margin-bottom:4px;}h2{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#5C7A4E;margin-bottom:8px;margin-top:24px;border-bottom:2px solid #5C7A4E;padding-bottom:4px;}.header-bar{background:#5C7A4E;color:white;padding:16px 24px;border-radius:12px;margin-bottom:24px;}.header-bar h1{color:white;}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;}.info-box{background:#F5F3EE;border-radius:8px;padding:12px 16px;}.info-box label{font-size:10px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:3px;}.info-box p{font-weight:600;font-size:13px;}.section-box{background:#F9F8F5;border:1px solid #E2DDD6;border-radius:10px;padding:14px 18px;margin-bottom:4px;}.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:10px;font-weight:700;background:#5C7A4E;color:white;margin-bottom:8px;}.footer{margin-top:32px;text-align:center;font-size:10px;color:#A8A29E;border-top:1px solid #E2DDD6;padding-top:16px;}@media print{body{padding:20px;}@page{margin:1.5cm;}}</style></head><body><div class="header-bar"><h1>eModul IKBAR V6.2 — Rekod Hasil Kerja Pelajar</h1><p>Tahap 2 · Minggu 4 · Akidah: Syirik · Voice Edition</p></div><div class="info-grid"><div class="info-box"><label>Nama Pelajar</label><p>${s.nama || '(Tiada)'}</p></div><div class="info-box"><label>Nombor Matrik</label><p>${s.matrik || '(Tiada)'}</p></div><div class="info-box"><label>Tarikh Hantar</label><p>${s.tarikhHantar || new Date().toLocaleString('ms-MY')}</p></div><div class="info-box"><label>Skor Kuiz</label><p>${s.quizScore || 'N/A'}</p></div></div><div class="info-grid" style="margin-top:12px;"><div class="info-box"><label>Rakaman Suara</label><p>${s.voiceRecordings ? s.voiceRecordings.length + ' rakaman' : 'Tiada'}</p></div><div class="info-box"><label>Jumlah Durasi</label><p>${s.voiceRecordings ? fmt(s.voiceRecordings.reduce((a,r)=>a+r.duration,0)) : '00:00'}</p></div></div><h2>INPUT</h2><div class="section-box"><div class="badge">Langkah 1</div><p>Pelajar telah dengar audio khutbah dan membaca teks dwibahasa tentang Syirik. INPUT selesai.</p></div><h2>PROSES KBAT</h2><div class="section-box"><div class="badge">Langkah 2</div><p>${prosesText}</p></div><h2>OUTPUT</h2><div class="section-box"><div class="badge">Langkah 3</div><p style="white-space:pre-wrap;">${(s.output || '(Tiada output teks — mungkin menjawab kuiz atau rakam suara sahaja)').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div><h2>REFLEKSI RABBANI</h2><div class="section-box"><div class="badge">Langkah 4</div><p class="ar" style="text-align:right;margin-bottom:8px;">${(s.refleksi || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div><div class="footer"><p>Dokumen ini dijana secara automatik oleh eModul IKBAR V6.2 · KIAS · Semua maklumat adalah hak pelajar yang berkenaan.</p></div><script>window.onload=function(){window.print();}<\/script></body></html>`);
-  printWin.document.close();
-}
-
-// ============================================
-// INIT
-// ============================================
-window.addEventListener('DOMContentLoaded', () => {
-  loadState();
-  if (state.theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-  if (state.highContrast) document.documentElement.setAttribute('data-contrast', 'high');
-  applyUnlock(); updateProgressDisplay(); initDragDrop(); initModalBackdrops(); initAudioPlayer(); renderFAQ();
-  if (state.output) { const t = document.getElementById('tulis-text'); if (t) { t.value = state.output; updateWordCount(); } }
-  if (state.refleksi) { const r = document.getElementById('refleksi-textarea'); if (r) r.value = state.refleksi; const p = state.refleksi.length > 60 ? state.refleksi.slice(0, 60) + '…' : state.refleksi; document.getElementById('refleksi-preview').textContent = p; }
-  if (state.nama) { const n = document.getElementById('gate-nama'); if (n) n.value = state.nama; }
-  if (state.matrik) { const m = document.getElementById('gate-matrik'); if (m) m.value = state.matrik; }
-  if (localStorage.getItem('ikbarGateSeen62') && state.nama && state.matrik) document.getElementById('gate-modal').style.display = 'none';
-  checkPendingQueue();
-  window.addEventListener('online', checkPendingQueue);
-});
-
-  /* --- MULA KOD INTEGRASI AUDIO UPLOAD (DIPERTINGKATKAN) --- */
+/* --- KOD PEMAPAR AUDIO TERKINI (PASTI BERFUNGSI) --- */
 
 const DB_NAME = 'eModulIKBAR_DB';
 const DB_VERSION = 1;
-let dbAudio;
+let dbAudio = null;
 
-// 1. Inisialisasi Database
-function initAudioDB() {
+// Fungsi Utama: Inisialisasi
+function initAudioSystem() {
+    console.log("🔄 Memulakan sistem audio...");
+    
+    // 1. Buka Database
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onupgradeneeded = function(event) {
-        dbAudio = event.target.result;
-        if (!dbAudio.objectStoreNames.contains('audioUploads')) {
-            dbAudio.createObjectStore('audioUploads', { keyPath: 'id', autoIncrement: true });
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains('audioUploads')) {
+            db.createObjectStore('audioUploads', { keyPath: 'id', autoIncrement: true });
+            console.log("✅ Database dicipta.");
         }
     };
 
     request.onsuccess = function(event) {
         dbAudio = event.target.result;
-        console.log("✅ Database Audio disambungkan.");
-        loadUploadedAudio(); // Load data bila siap
+        console.log("✅ Database berjaya dibuka.");
+        
+        // Semak jika container wujud, jika tidak, cuba cipta secara dinamik sebagai backup
+        let container = document.getElementById('forcedAudioContainer');
+        if (!container) {
+            createBackupContainer();
+            container = document.getElementById('forcedAudioContainer');
+        }
+        
+        // Load data
+        loadAndRenderAudio();
     };
 
     request.onerror = function(event) {
         console.error("❌ Ralat Database:", event.target.errorCode);
+        alert("Ralat mengakses database pelayar.");
     };
 }
 
-// 2. Ambil Data dari Database
-function loadUploadedAudio() {
+// Fungsi Backup: Cipta container jika user lupa letak HTML manual
+function createBackupContainer() {
+    console.log("⚠️ Container tidak dijumpai, mencipta backup...");
+    const newDiv = document.createElement('div');
+    newDiv.id = 'forcedAudioContainer';
+    newDiv.style.cssText = "width: 90%; margin: 20px auto; padding: 20px; background: #fffbeb; border: 2px solid #f59e0b; border-radius: 10px; font-family: sans-serif;";
+    newDiv.innerHTML = `<h3 style="color:#b45309">📂 Bahan Audio Dimuat Naik</h3><div id="audioListContent"></div>`;
+    
+    // Letak di akhir body sebelum script
+    document.body.insertBefore(newDiv, document.body.lastElementChild);
+}
+
+// Fungsi Load & Render
+function loadAndRenderAudio() {
     if (!dbAudio) return;
+
+    const contentDiv = document.getElementById('audioListContent');
+    if (!contentDiv) return;
 
     const transaction = dbAudio.transaction(['audioUploads'], 'readonly');
     const store = transaction.objectStore('audioUploads');
-    const request = store.getAll();
+    const getAllRequest = store.getAll();
 
-    request.onsuccess = function() {
-        const items = request.result;
-        injectAudioUI(items);
+    getAllRequest.onsuccess = function() {
+        const items = getAllRequest.result;
+        renderItems(items, contentDiv);
+    };
+
+    getAllRequest.onerror = function() {
+        contentDiv.innerHTML = "<p style='color:red'>Gagal membaca data.</p>";
     };
 }
 
-// 3. Suntik UI ke dalam Halaman (Logik Pencarian Pintar)
-function injectAudioUI(items) {
-    // Cari container sedia ada untuk elak duplikasi
-    let existingContainer = document.getElementById('customUploadedAudioSection');
-    
-    if (existingContainer) {
-        // Jika dah ada, kosongkan dan buat baru
-        existingContainer.innerHTML = '';
-    } else {
-        // CARI LOKASI UNTUK SUNTIK:
-        // Strategi A: Cari berdasarkan label "Rakaman" atau "Voice"
-        const allHeaders = document.querySelectorAll('h2, h3, h4, label, .section-title');
-        let targetParent = null;
-        
-        for (let el of allHeaders) {
-            const text = el.innerText.toLowerCase();
-            if (text.includes('rakaman') || text.includes('voice') || text.includes('suara')) {
-                // Naik ke parent yang lebih besar (section atau div container)
-                targetParent = el.closest('.content-section, .card, .panel, div[style*="padding"]');
-                if (!targetParent) targetParent = el.parentElement;
-                break;
-            }
-        }
+// Fungsi Paparan (Render)
+function renderItems(items, container) {
+    container.innerHTML = ""; // Kosongkan dulu
 
-        // Strategi B: Jika tak jumpa, cari butang "Rekod" atau "Mula Rakam"
-        if (!targetParent) {
-            const recButtons = document.querySelectorAll('button');
-            for (let btn of recButtons) {
-                if (btn.innerText.toLowerCase().includes('rekod') || btn.innerText.toLowerCase().includes('record')) {
-                    targetParent = btn.closest('.voice-controls, .control-panel, div');
-                    break;
-                }
-            }
-        }
-
-        // Strategi C: Last resort, letak di akhir body atau sebelum footer
-        if (!targetParent) {
-            targetParent = document.querySelector('.main-content') || document.body;
-        }
-
-        // BINA CONTAINER BARU
-        const newSection = document.createElement('div');
-        newSection.id = 'customUploadedAudioSection';
-        newSection.style.marginTop = '25px';
-        newSection.style.padding = '20px';
-        newSection.style.background = '#f0f9ff'; // Biru muda lembut
-        newSection.style.borderRadius = '12px';
-        newSection.style.border = '2px solid #bae6fd';
-        newSection.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-
-        const title = document.createElement('h3');
-        title.innerHTML = '📂 Bahan Audio Dimuat Naik (MP3/WAV)';
-        title.style.color = '#0369a1';
-        title.style.marginTop = '0';
-        title.style.borderBottom = '2px solid #bae6fd';
-        title.style.paddingBottom = '10px';
-        
-        const listContainer = document.createElement('div');
-        listContainer.id = 'audioItemsList';
-        listContainer.style.display = 'flex';
-        listContainer.style.flexDirection = 'column';
-        listContainer.style.gap = '15px';
-
-        newSection.appendChild(title);
-        newSection.appendChild(listContainer);
-
-        // SUNTIK KE DALAM HALAMAN
-        // Cuba letak selepas elemen target, atau append jika gagal
-        if (targetParent && targetParent.parentNode) {
-             targetParent.parentNode.insertBefore(newSection, targetParent.nextSibling);
-        } else {
-            document.body.appendChild(newSection);
-        }
-        
-        existingContainer = listContainer;
-    }
-
-    // RENDER ITEM
-    if (items.length === 0) {
-        existingContainer.innerHTML = '<p style="color:#666; font-style:italic; text-align:center;">Belum ada bahan audio dimuat naik.</p>';
+    if (!items || items.length === 0) {
+        container.innerHTML = `
+            <p style="color: #666; font-style: italic;">
+                Belum ada bahan audio dimuat naik. 
+                <br>Sila gunakan fail <strong>upload_audio.html</strong> untuk menambah bahan.
+            </p>`;
         return;
     }
 
+    // Loop setiap item
     items.forEach(item => {
         const card = document.createElement('div');
-        card.style.background = '#ffffff';
-        card.style.padding = '15px';
-        card.style.borderRadius = '8px';
-        card.style.border = '1px solid #e5e7eb';
-        card.style.display = 'flex';
-        card.style.flexDirection = 'column';
-        card.style.gap = '8px';
-        card.style.transition = 'transform 0.2s';
-        card.onmouseenter = () => card.style.transform = 'translateY(-2px)';
-        card.onmouseleave = () => card.style.transform = 'translateY(0)';
-
-        // Header Card
-        const headerDiv = document.createElement('div');
-        headerDiv.style.display = 'flex';
-        headerDiv.style.justifyContent = 'space-between';
-        headerDiv.style.alignItems = 'center';
+        card.style.cssText = "background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #16a34a;";
         
-        const metaTitle = document.createElement('strong');
-        metaTitle.textContent = item.topic || 'Tanpa Tajuk';
-        metaTitle.style.color = '#1f2937';
-        metaTitle.style.fontSize = '1.1rem';
+        // Tajuk & Kategori
+        const header = document.createElement('div');
+        header.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;";
+        header.innerHTML = `
+            <strong style="font-size: 1.1rem; color: #333;">${item.topic || 'Tanpa Tajuk'}</strong>
+            <span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">${item.category || 'Umum'}</span>
+        `;
 
-        const badge = document.createElement('span');
-        badge.textContent = item.category || 'Umum';
-        badge.style.background = '#dbeafe';
-        badge.style.color = '#1e40af';
-        badge.style.padding = '2px 8px';
-        badge.style.borderRadius = '12px';
-        badge.style.fontSize = '0.75rem';
-        badge.style.fontWeight = 'bold';
-
-        headerDiv.appendChild(metaTitle);
-        headerDiv.appendChild(badge);
-
-        // Description
-        const descText = document.createElement('p');
-        descText.textContent = item.description || '';
-        descText.style.margin = '0';
-        descText.style.fontSize = '0.9rem';
-        descText.style.color = '#4b5563';
-        descText.style.lineHeight = '1.4';
+        // Keterangan
+        const desc = document.createElement('p');
+        desc.style.cssText = "margin: 5px 0; color: #555; font-size: 0.9rem;";
+        desc.textContent = item.description || '';
 
         // Audio Player
-        const audioEl = document.createElement('audio');
-        audioEl.controls = true;
-        audioEl.src = item.audioData;
-        audioEl.style.width = '100%';
-        audioEl.style.marginTop = '5px';
-        audioEl.style.borderRadius = '4px';
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.style.width = "100%";
+        audio.style.marginTop = "10px";
+        audio.src = item.audioData; // Data Base64 dari IndexedDB
 
-        // Delete Button
+        // Butang Padam
         const delBtn = document.createElement('button');
-        delBtn.textContent = '🗑️ Padam Fail';
-        delBtn.style.background = '#fee2e2';
-        delBtn.style.color = '#b91c1c';
-        delBtn.style.border = '1px solid #fecaca';
-        delBtn.style.padding = '6px 12px';
-        delBtn.style.borderRadius = '6px';
-        delBtn.style.cursor = 'pointer';
-        delBtn.style.alignSelf = 'flex-start';
-        delBtn.style.fontSize = '0.85rem';
-        delBtn.style.marginTop = '5px';
-        delBtn.onclick = () => deleteAudioItem(item.id);
+        delBtn.textContent = "🗑️ Padam";
+        delBtn.style.cssText = "margin-top: 10px; background: #fee2e2; color: #991b1b; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right;";
+        delBtn.onclick = function() { deleteItem(item.id); };
 
-        card.appendChild(headerDiv);
-        card.appendChild(descText);
-        card.appendChild(audioEl);
+        card.appendChild(header);
+        card.appendChild(desc);
+        card.appendChild(audio);
         card.appendChild(delBtn);
+        
+        // Clear float
+        const clear = document.createElement('div');
+        clear.style.clear = "both";
+        card.appendChild(clear);
 
-        existingContainer.appendChild(card);
+        container.appendChild(card);
     });
 }
 
-// 4. Fungsi Padam
-function deleteAudioItem(id) {
-    if(!confirm("Adakah anda pasti mahu memadam bahan audio ini?")) return;
-    
+// Fungsi Padam
+function deleteItem(id) {
+    if(!confirm("Adakah anda pasti mahu memadam fail ini?")) return;
+
     const transaction = dbAudio.transaction(['audioUploads'], 'readwrite');
     const store = transaction.objectStore('audioUploads');
     store.delete(id);
-    
-    transaction.oncomplete = () => {
-        alert("✅ Bahan audio berjaya dipadam.");
-        loadUploadedAudio(); // Refresh list
+
+    transaction.oncomplete = function() {
+        alert("Fail berjaya dipadam!");
+        loadAndRenderAudio(); // Refresh semula
     };
 }
 
-// Jalankan bila halaman siap
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAudioDB);
-} else {
-    initAudioDB();
-}
+// JALANKAN SISTEM APABILA HALAMAN SIAP
+window.addEventListener('DOMContentLoaded', initAudioSystem);
 
-/* --- TAMAT KOD INTEGRASI --- */
+/* --- TAMAT KOD --- */
 </script>
   <!-- WADAH PAKSAAAN UNTUK AUDIO UPLOAD -->
 <div id="forcedAudioContainer" style="width: 100%; margin: 20px 0; padding: 20px; background: #f0fdf4; border: 2px dashed #16a34a; border-radius: 10px; display: block;">
