@@ -1,1450 +1,458 @@
 <!DOCTYPE html>
-<html lang="ms" dir="ltr">
+<html lang="ms">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<meta name="description" content="eModul IKBAR V6.2 — Pembelajaran dwibahasa Akidah: Syirik dengan Audio Player & Voice Recording.">
-<meta name="theme-color" content="#5C7A4E">
-<title>eModul IKBAR V6.2 | Tahap 2 Minggu 4: Syirik</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-:root {
-  --sage-50: #f4f7f2; --sage-100: #e3ebd9; --sage-200: #c5d6b5; --sage-300: #9ebf88;
-  --sage-400: #7a9e6a; --sage-500: #5C7A4E; --sage-600: #4a633f; --sage-700: #3D5235;
-  --sage-800: #2f4029; --sage-900: #1e2a1a;
-  --gold-50: #fdf9f0; --gold-100: #f9edc7; --gold-200: #f0db8a; --gold-300: #e5c55a;
-  --gold-400: #D4A017; --gold-500: #B8860B; --gold-600: #966d09;
-  --stone-0: #FFFFFF; --stone-50: #FEFDF8; --stone-100: #F5F3EE; --stone-200: #E8E4DC;
-  --stone-300: #D6D0C8; --stone-400: #A8A29E; --stone-500: #78716C; --stone-600: #57534E;
-  --stone-700: #44403C; --stone-800: #292524; --stone-900: #1C1917;
-  --success-50: #ECFDF5; --success-500: #059669; --success-600: #065F46;
-  --error-50: #FEF2F2; --error-500: #DC2626; --error-600: #991B1B;
-  --warning-50: #FFFBEB; --warning-500: #F59E0B; --warning-600: #92400E;
-  --info-50: #EFF6FF; --info-500: #3B82F6;
-  --record-50: #FDF2F8; --record-500: #EC4899; --record-600: #DB2777;
-  --text-xs: clamp(0.65rem, 0.7vw + 0.5rem, 0.75rem);
-  --text-sm: clamp(0.75rem, 0.8vw + 0.55rem, 0.875rem);
-  --text-base: clamp(0.875rem, 0.9vw + 0.6rem, 1rem);
-  --text-lg: clamp(1rem, 1vw + 0.65rem, 1.125rem);
-  --text-xl: clamp(1.125rem, 1.2vw + 0.7rem, 1.25rem);
-  --text-2xl: clamp(1.25rem, 1.5vw + 0.8rem, 1.5rem);
-  --text-3xl: clamp(1.5rem, 2vw + 0.9rem, 2rem);
-  --text-4xl: clamp(1.75rem, 2.5vw + 1rem, 2.5rem);
-  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
-  --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
-  --shadow-sm: 0 1px 2px rgba(28,25,23,0.05); --shadow-md: 0 4px 12px rgba(28,25,23,0.08);
-  --shadow-lg: 0 8px 24px rgba(28,25,23,0.12); --shadow-xl: 0 16px 48px rgba(28,25,23,0.16);
-  --shadow-glow: 0 0 0 3px rgba(92,122,78,0.25);
-  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px;
-  --radius-2xl: 24px; --radius-full: 9999px;
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-  --header-height: 64px; --max-content-width: 900px;
-  --container-padding: clamp(1rem, 3vw, 1.5rem);
-}
-
-[data-theme="dark"] {
-  --stone-0: #1C1917; --stone-50: #292524; --stone-100: #44403C; --stone-200: #57534E;
-  --stone-300: #78716C; --stone-400: #A8A29E; --stone-500: #D6D0C8; --stone-600: #E8E4DC;
-  --stone-700: #F5F3EE; --stone-800: #FEFDF8; --stone-900: #FFFFFF;
-  --sage-50: #1e2a1a; --sage-100: #2f4029; --sage-500: #7a9e6a; --sage-700: #c5d6b5;
-  --gold-500: #D4A017; --record-500: #EC4899; --record-600: #DB2777;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.2); --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
-}
-
-* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
-html { scroll-behavior: smooth; font-size: 16px; }
-body {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  background: var(--stone-100); color: var(--stone-900); margin: 0;
-  line-height: 1.6; min-height: 100vh; overflow-x: hidden;
-}
-.ar, .arabic {
-  font-family: 'Noto Naskh Arabic', 'Amiri', serif; direction: rtl; line-height: 2;
-  font-feature-settings: "cv01" on, "cv02" on;
-}
-:focus-visible { outline: 3px solid var(--sage-500); outline-offset: 2px; border-radius: var(--radius-sm); }
-button:focus-visible, a:focus-visible, [tabindex]:focus-visible { box-shadow: var(--shadow-glow); }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
-.container { width: 100%; max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--container-padding); }
-
-/* HEADER */
-.app-header { background: rgba(254,253,248,0.92); border-bottom: 1px solid var(--stone-200); backdrop-filter: blur(12px) saturate(180%); position: sticky; top: 0; z-index: 40; height: var(--header-height); transition: var(--transition-base); }
-[data-theme="dark"] .app-header { background: rgba(28,25,23,0.92); border-bottom-color: var(--stone-200); }
-.header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; gap: var(--space-3); }
-.brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; }
-.brand-mark { height: 40px; padding: 0 12px; border-radius: var(--radius-lg); background: var(--sage-500); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: var(--transition-fast); }
-.brand-mark:hover { background: var(--sage-600); transform: scale(1.05); }
-.brand-mark .ar { color: white; font-size: var(--text-lg); font-weight: 700; }
-.brand-text { display: flex; flex-direction: column; }
-.brand-title { font-weight: 800; font-size: var(--text-base); line-height: 1.2; color: var(--stone-900); }
-.brand-version { font-size: var(--text-xs); color: var(--stone-400); }
-.header-actions { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
-.badge-lang { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: var(--radius-full); background: var(--warning-50); border: 1px solid var(--warning-500); font-size: var(--text-xs); font-weight: 600; color: var(--warning-600); }
-.badge-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--warning-500); animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-
-/* BUTTONS */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); border: none; border-radius: var(--radius-lg); padding: 0.65rem 1.25rem; font-size: var(--text-sm); font-weight: 600; cursor: pointer; transition: all var(--transition-fast); font-family: inherit; -webkit-tap-highlight-color: transparent; touch-action: manipulation; min-height: 44px; position: relative; overflow: hidden; }
-.btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0); transition: background var(--transition-fast); }
-.btn:active::after { background: rgba(255,255,255,0.15); }
-.btn-primary { background: var(--sage-500); color: white; }
-.btn-primary:hover { background: var(--sage-600); transform: translateY(-1px); box-shadow: var(--shadow-md); }
-.btn-secondary { background: var(--stone-100); color: var(--stone-700); border: 1.5px solid var(--stone-200); }
-.btn-secondary:hover { background: var(--stone-200); border-color: var(--stone-300); }
-.btn-ghost { background: transparent; color: var(--stone-600); border: 1.5px solid transparent; }
-.btn-ghost:hover { background: var(--stone-100); border-color: var(--stone-200); }
-.btn-icon { width: 40px; height: 40px; padding: 0; border-radius: 50%; background: white; border: 1.5px solid var(--stone-200); color: var(--stone-500); font-size: 18px; }
-.btn-icon:hover { background: var(--stone-100); color: var(--stone-700); border-color: var(--stone-300); }
-.btn-sm { padding: 0.4rem 0.875rem; font-size: var(--text-xs); min-height: 36px; border-radius: var(--radius-md); }
-.btn-record { background: var(--record-500); color: white; }
-.btn-record:hover { background: var(--record-600); transform: translateY(-1px); box-shadow: var(--shadow-md); }
-.btn-record.recording { animation: record-pulse 1.5s infinite; }
-.btn-danger { background: var(--error-500); color: white; }
-.btn-danger:hover { background: var(--error-600); }
-
-/* CARDS */
-.card { background: var(--stone-0); border: 1px solid var(--stone-200); border-radius: var(--radius-2xl); padding: var(--space-5); transition: all var(--transition-base); }
-.card-hover:hover { border-color: var(--sage-300); box-shadow: var(--shadow-lg); transform: translateY(-2px); }
-.surface-elevated { background: var(--stone-0); border: 1px solid var(--stone-200); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); }
-
-/* PROGRESS */
-.progress-ring { position: relative; width: 60px; height: 60px; }
-.progress-ring svg { transform: rotate(-90deg); }
-.progress-ring-bg { fill: none; stroke: var(--stone-200); stroke-width: 4; }
-.progress-ring-fill { fill: none; stroke: var(--sage-500); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-.progress-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: var(--text-sm); font-weight: 800; color: var(--stone-900); }
-.step-dots { display: flex; gap: 4px; }
-.step-dot { height: 5px; flex: 1; border-radius: var(--radius-full); background: var(--stone-200); transition: all var(--transition-base); }
-.step-dot.active { background: var(--sage-500); }
-
-/* NAV CARDS */
-.nav-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
-.nav-card { background: var(--stone-0); border: 1.5px solid var(--stone-200); border-radius: var(--radius-2xl); padding: var(--space-5); cursor: pointer; transition: all var(--transition-base); position: relative; text-align: left; -webkit-tap-highlight-color: transparent; touch-action: manipulation; display: flex; flex-direction: column; gap: var(--space-2); }
-.nav-card:hover:not(.locked):not(:disabled) { border-color: var(--sage-400); box-shadow: var(--shadow-lg); transform: translateY(-3px); }
-.nav-card:active:not(.locked) { transform: translateY(-1px); }
-.nav-card.locked { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
-.nav-card.completed { border-color: var(--sage-200); }
-.nav-card.completed .step-num { background: var(--sage-500); }
-.nav-card.completed::after { content: '✓'; position: absolute; top: var(--space-3); right: var(--space-3); width: 24px; height: 24px; background: var(--success-50); color: var(--success-600); border-radius: 50%; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid var(--success-500); }
-.nav-card .live-indicator { position: absolute; top: var(--space-3); right: var(--space-3); width: 10px; height: 10px; border-radius: 50%; background: var(--success-500); box-shadow: 0 0 0 3px var(--stone-0); }
-.step-num { width: 44px; height: 44px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: var(--text-base); flex-shrink: 0; transition: var(--transition-fast); }
-.nav-title { font-weight: 700; font-size: var(--text-base); color: var(--stone-900); }
-.nav-desc { font-size: var(--text-sm); color: var(--stone-500); line-height: 1.5; }
-
-/* MODAL */
-.dialog-overlay { position: fixed; inset: 0; background: rgba(15,10,5,0.7); backdrop-filter: blur(8px); z-index: 50; display: none; align-items: flex-start; justify-content: center; padding: var(--space-4); overflow-y: auto; -webkit-overflow-scrolling: touch; opacity: 0; transition: opacity var(--transition-base); }
-.dialog-overlay.active { display: flex; opacity: 1; }
-.dialog-box { background: var(--stone-50); border-radius: var(--radius-2xl); width: 100%; max-width: 680px; box-shadow: var(--shadow-xl); border: 1px solid var(--stone-200); display: flex; flex-direction: column; max-height: 90vh; overflow: hidden; margin: auto; transform: scale(0.95) translateY(10px); opacity: 0; transition: all var(--transition-base); }
-.dialog-overlay.active .dialog-box { transform: scale(1) translateY(0); opacity: 1; }
-.dialog-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--stone-200); background: rgba(255,255,255,0.7); backdrop-filter: blur(4px); flex-shrink: 0; gap: var(--space-3); }
-.dialog-body { padding: var(--space-5); overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--stone-300) transparent; }
-.dialog-body::-webkit-scrollbar { width: 6px; }
-.dialog-body::-webkit-scrollbar-track { background: transparent; }
-.dialog-body::-webkit-scrollbar-thumb { background: var(--stone-300); border-radius: var(--radius-full); }
-.dialog-footer { padding: var(--space-4) var(--space-5); border-top: 1px solid var(--stone-200); background: var(--stone-0); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
-
-/* TOOLTIP */
-.word-tooltip { position: relative; display: inline-block; cursor: pointer; border-bottom: 2px dotted var(--sage-400); transition: var(--transition-fast); padding: 0 2px; border-radius: 2px; }
-.word-tooltip:hover, .word-tooltip.tip-active { background: var(--sage-50); border-bottom-style: solid; }
-.tip-box { position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background: var(--stone-900); color: var(--stone-0); font-size: var(--text-xs); font-family: 'Plus Jakarta Sans', sans-serif; padding: 6px 12px; border-radius: var(--radius-md); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity var(--transition-fast), transform var(--transition-fast); z-index: 100; box-shadow: var(--shadow-lg); font-weight: 500; }
-.tip-box::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--stone-900); }
-.word-tooltip:hover .tip-box, .word-tooltip.tip-active .tip-box { opacity: 1; transform: translateX(-50%) translateY(-4px); }
-.tts-btn { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--sage-500); color: white; border: none; cursor: pointer; font-size: 10px; margin-right: 4px; vertical-align: middle; opacity: 0; transition: opacity var(--transition-fast); }
-.word-tooltip:hover .tts-btn, .word-tooltip.tip-active .tts-btn { opacity: 1; }
-
-/* DRAG DROP */
-.drag-chip { cursor: grab; user-select: none; touch-action: none; display: inline-block; -webkit-tap-highlight-color: transparent; transition: var(--transition-fast); }
-.drag-chip:active { cursor: grabbing; }
-.drag-chip.dragging { opacity: 0.35; transform: scale(0.95); }
-.drag-chip.tap-selected .chip-inner { border-color: var(--sage-500) !important; background: var(--sage-50) !important; box-shadow: var(--shadow-glow); transform: scale(1.05); }
-.chip-inner { padding: 10px 16px; background: var(--stone-0); border: 1.5px solid var(--stone-300); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 8px; transition: all var(--transition-fast); }
-.chip-inner:hover { border-color: var(--sage-400); box-shadow: var(--shadow-md); }
-.drop-zone { min-height: 120px; border: 2px dashed var(--stone-300); border-radius: var(--radius-xl); padding: var(--space-3); display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; transition: all var(--transition-fast); position: relative; background: var(--stone-50); }
-.drop-zone.drag-over, .drop-zone.tap-target { border-color: var(--sage-500); background: var(--sage-50); box-shadow: inset 0 0 0 1px var(--sage-200); }
-.drop-zone-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: var(--text-xs); color: var(--stone-400); pointer-events: none; white-space: nowrap; transition: opacity var(--transition-fast); text-align: center; width: 100%; }
-.drop-zone:not(:empty) .drop-zone-label { opacity: 0; }
-
-/* QUIZ */
-.quiz-option { width: 100%; text-align: left; padding: var(--space-3) var(--space-4); border: 1.5px solid var(--stone-200); border-radius: var(--radius-lg); cursor: pointer; background: var(--stone-0); font-family: inherit; font-size: var(--text-sm); transition: all var(--transition-fast); display: flex; align-items: center; gap: var(--space-3); min-height: 52px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; position: relative; overflow: hidden; }
-.quiz-option::before { content: ''; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--stone-300); display: flex; align-items: center; justify-content: center; font-size: var(--text-xs); font-weight: 700; flex-shrink: 0; transition: all var(--transition-fast); }
-.quiz-option:hover:not(:disabled) { border-color: var(--sage-400); background: var(--sage-50); }
-.quiz-option.correct { border-color: var(--success-500); background: var(--success-50); color: var(--success-600); }
-.quiz-option.correct::before { content: '✓'; border-color: var(--success-500); background: var(--success-500); color: white; }
-.quiz-option.wrong { border-color: var(--error-500); background: var(--error-50); color: var(--error-600); }
-.quiz-option.wrong::before { content: '✕'; border-color: var(--error-500); background: var(--error-500); color: white; }
-.quiz-option:disabled { cursor: default; }
-
-/* TOAST */
-.toast-container { position: fixed; bottom: var(--space-5); left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: var(--space-2); align-items: center; pointer-events: none; width: min(400px, 90vw); }
-.toast { background: var(--stone-900); color: white; padding: var(--space-3) var(--space-4); border-radius: var(--radius-xl); font-size: var(--text-sm); font-weight: 500; display: flex; align-items: flex-start; gap: 10px; opacity: 0; transform: translateY(20px); transition: all var(--transition-base); pointer-events: auto; max-width: 100%; line-height: 1.5; box-shadow: var(--shadow-xl); }
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.error { background: var(--error-600); }
-.toast.success { background: var(--success-600); }
-.toast.warning { background: var(--warning-600); }
-
-/* TOUR */
-.tour-highlight { position: relative; z-index: 45; box-shadow: 0 0 0 4px var(--sage-500), 0 0 0 8px rgba(92,122,78,0.2); border-radius: var(--radius-md); }
-.tour-overlay { position: fixed; inset: 0; background: rgba(15,10,5,0.75); z-index: 44; display: none; }
-.tour-overlay.active { display: block; }
-.tour-bubble { position: fixed; z-index: 46; background: var(--stone-0); border-radius: var(--radius-xl); padding: var(--space-5); max-width: min(360px, 90vw); box-shadow: var(--shadow-xl); border: 1px solid var(--stone-200); animation: modal-in 0.25s ease; }
-.tour-bubble::before { content: ''; position: absolute; width: 14px; height: 14px; background: var(--stone-0); transform: rotate(45deg); border: 1px solid var(--stone-200); }
-.tour-bubble.arrow-top::before { top: -7px; left: 24px; border-bottom: none; border-right: none; }
-.tour-bubble.arrow-bottom::before { bottom: -7px; left: 24px; border-top: none; border-left: none; }
-
-/* HELP */
-.help-bg { position: fixed; inset: 0; background: rgba(15,10,5,0.5); z-index: 59; display: none; opacity: 0; transition: opacity var(--transition-base); }
-.help-bg.active { display: block; opacity: 1; }
-.help-panel { position: fixed; inset: 0; z-index: 60; display: none; align-items: flex-end; justify-content: center; pointer-events: none; }
-.help-panel.active { display: flex; }
-.help-sheet { background: var(--stone-0); border-radius: var(--radius-2xl) var(--radius-2xl) 0 0; width: 100%; max-width: 680px; max-height: 85vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: var(--space-5); box-shadow: 0 -20px 60px rgba(0,0,0,0.2); animation: sheet-up 0.3s cubic-bezier(0.34, 1.2, 0.64, 1); pointer-events: auto; }
-
-/* GATE */
-.gate-modal { position: fixed; inset: 0; z-index: 55; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: var(--space-4); backdrop-filter: blur(4px); }
-.gate-box { background: var(--stone-0); border-radius: var(--radius-2xl); max-width: 440px; width: 100%; padding: var(--space-6); box-shadow: var(--shadow-xl); border: 1px solid var(--stone-200); animation: modal-in 0.3s ease; }
-.input-group { margin-bottom: var(--space-4); }
-.input-label { display: block; font-size: var(--text-sm); font-weight: 600; color: var(--stone-700); margin-bottom: var(--space-2); }
-.input-field { width: 100%; padding: var(--space-3) var(--space-4); border: 1.5px solid var(--stone-200); border-radius: var(--radius-lg); font-size: var(--text-base); font-family: inherit; color: var(--stone-900); background: var(--stone-0); outline: none; transition: all var(--transition-fast); }
-.input-field:hover { border-color: var(--stone-300); }
-.input-field:focus { border-color: var(--sage-500); box-shadow: var(--shadow-glow); }
-.input-error { font-size: var(--text-xs); color: var(--error-500); margin: var(--space-1) 0 0; display: none; }
-.input-field.error { border-color: var(--error-500); }
-.input-field.error + .input-error { display: block; }
-
-/* AUDIO PLAYER */
-.audio-player-container { position: relative; background: linear-gradient(135deg, var(--stone-900) 0%, #2a2520 100%); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-5); box-shadow: var(--shadow-lg); }
-.audio-player-bg { position: absolute; inset: 0; opacity: 0.25; object-fit: cover; width: 100%; height: 100%; }
-.audio-player-content { position: relative; z-index: 2; padding: var(--space-6); display: flex; flex-direction: column; align-items: center; gap: var(--space-4); }
-.audio-player-title { color: white; font-size: var(--text-sm); font-weight: 600; text-align: center; opacity: 0.9; }
-.audio-player-title .ar { font-size: var(--text-xl); display: block; margin-bottom: var(--space-1); }
-.audio-main-btn { width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.95); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--transition-fast); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-.audio-main-btn:hover { transform: scale(1.1); background: white; }
-.audio-main-btn:active { transform: scale(0.95); }
-.audio-main-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.audio-progress-area { width: 100%; max-width: 400px; display: flex; align-items: center; gap: var(--space-3); }
-.audio-time { color: rgba(255,255,255,0.85); font-size: var(--text-xs); font-variant-numeric: tabular-nums; font-weight: 600; min-width: 40px; text-align: center; }
-.audio-progress-track { flex: 1; height: 6px; background: rgba(255,255,255,0.2); border-radius: var(--radius-full); overflow: hidden; cursor: pointer; position: relative; }
-.audio-progress-fill { height: 100%; background: var(--sage-400); border-radius: var(--radius-full); width: 0%; transition: width 0.1s linear; position: relative; }
-.audio-progress-fill::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; background: white; border-radius: 50%; box-shadow: 0 0 8px rgba(0,0,0,0.3); opacity: 0; transition: opacity var(--transition-fast); }
-.audio-progress-track:hover .audio-progress-fill::after { opacity: 1; }
-.audio-controls-row { display: flex; align-items: center; gap: var(--space-4); }
-.audio-ctrl-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: all var(--transition-fast); }
-.audio-ctrl-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
-.audio-badge-row { display: flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center; }
-.audio-badge { background: rgba(0,0,0,0.4); color: rgba(255,255,255,0.9); font-size: var(--text-xs); padding: 4px 12px; border-radius: var(--radius-md); backdrop-filter: blur(4px); }
-.audio-fallback-notice { background: rgba(255,255,255,0.1); border: 1px dashed rgba(255,255,255,0.3); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); text-align: center; color: rgba(255,255,255,0.7); font-size: var(--text-xs); max-width: 400px; }
-.audio-fallback-notice button { background: var(--sage-500); color: white; border: none; padding: 6px 14px; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600; cursor: pointer; margin-top: var(--space-2); font-family: inherit; }
-.audio-fallback-notice button:hover { background: var(--sage-600); }
-
-/* ============================================
-   VOICE RECORDER — V6.2 NEW
-   ============================================ */
-.voice-recorder-card {
-  background: linear-gradient(135deg, var(--record-50) 0%, #fff0f7 100%);
-  border: 2px solid var(--record-500);
-  border-radius: var(--radius-xl);
-  padding: var(--space-6);
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.voice-recorder-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 70%);
-  animation: voice-glow 3s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes voice-glow {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.1); opacity: 0.8; }
-}
-
-.voice-recorder-header {
-  position: relative;
-  z-index: 1;
-  margin-bottom: var(--space-5);
-}
-
-.voice-recorder-header h4 {
-  font-size: var(--text-lg);
-  font-weight: 700;
-  color: var(--record-600);
-  margin: 0 0 4px;
-}
-
-.voice-recorder-header p {
-  font-size: var(--text-sm);
-  color: var(--stone-600);
-  margin: 0;
-}
-
-.voice-recorder-main {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-5);
-}
-
-.voice-record-btn {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: var(--record-500);
-  color: white;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-  transition: all var(--transition-base);
-  box-shadow: 0 8px 32px rgba(236,72,153,0.35);
-  position: relative;
-}
-
-.voice-record-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 12px 40px rgba(236,72,153,0.45);
-}
-
-.voice-record-btn:active {
-  transform: scale(0.95);
-}
-
-.voice-record-btn.recording {
-  animation: record-pulse 1.2s ease-in-out infinite;
-  background: var(--error-500);
-}
-
-.voice-record-btn.recording .record-icon-default { display: none; }
-.voice-record-btn.recording .record-icon-active { display: flex; }
-
-.record-icon-default { display: flex; }
-.record-icon-active { display: none; }
-
-@keyframes record-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(236,72,153,0.5), 0 8px 32px rgba(236,72,153,0.35); }
-  50% { box-shadow: 0 0 0 20px rgba(236,72,153,0), 0 8px 32px rgba(236,72,153,0.35); }
-}
-
-.voice-timer {
-  font-size: var(--text-3xl);
-  font-weight: 800;
-  color: var(--record-600);
-  font-variant-numeric: tabular-nums;
-  font-family: 'Plus Jakarta Sans', monospace;
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.voice-status {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--stone-600);
-  min-height: 24px;
-}
-
-.voice-status.recording { color: var(--error-500); }
-
-.voice-waveform {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  height: 50px;
-  width: 100%;
-  max-width: 280px;
-}
-
-.voice-bar {
-  width: 4px;
-  background: var(--record-500);
-  border-radius: var(--radius-full);
-  transition: height 0.1s ease;
-  opacity: 0.3;
-}
-
-.voice-bar.active {
-  opacity: 1;
-  animation: voice-bar-dance 0.5s ease-in-out infinite alternate;
-}
-
-@keyframes voice-bar-dance {
-  0% { height: 8px; }
-  100% { height: 40px; }
-}
-
-.voice-recordings-list {
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.voice-recording-item {
-  background: var(--stone-0);
-  border: 1.5px solid var(--stone-200);
-  border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-4);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  transition: all var(--transition-fast);
-}
-
-.voice-recording-item:hover {
-  border-color: var(--sage-300);
-  box-shadow: var(--shadow-sm);
-}
-
-.voice-recording-item .rec-name {
-  flex: 1;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--stone-900);
-  text-align: left;
-}
-
-.voice-recording-item .rec-time {
-  font-size: var(--text-xs);
-  color: var(--stone-500);
-  font-variant-numeric: tabular-nums;
-}
-
-.voice-recording-item .rec-actions {
-  display: flex;
-  gap: var(--space-1);
-}
-
-.voice-recording-item .rec-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1.5px solid var(--stone-200);
-  background: var(--stone-0);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  transition: all var(--transition-fast);
-}
-
-.voice-recording-item .rec-btn:hover {
-  background: var(--stone-100);
-  border-color: var(--stone-300);
-  transform: scale(1.1);
-}
-
-.voice-recording-item .rec-btn.play-btn { color: var(--sage-500); }
-.voice-recording-item .rec-btn.delete-btn { color: var(--error-500); }
-
-.voice-recording-item .rec-btn.play-btn.playing {
-  background: var(--sage-500);
-  color: white;
-  border-color: var(--sage-500);
-}
-
-.voice-guide-box {
-  background: var(--stone-0);
-  border: 1px solid var(--stone-200);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  text-align: left;
-  width: 100%;
-  max-width: 480px;
-}
-
-.voice-guide-box h5 {
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--stone-900);
-  margin: 0 0 var(--space-2);
-}
-
-.voice-guide-box p {
-  font-size: var(--text-xs);
-  color: var(--stone-600);
-  margin: 0;
-  line-height: 1.6;
-}
-
-.voice-guide-box .ar {
-  font-size: var(--text-lg);
-  color: var(--stone-900);
-  display: block;
-  margin-bottom: var(--space-1);
-}
-
-/* TABS */
-.tab-group { display: flex; gap: 4px; padding: 4px; background: var(--stone-100); border-radius: var(--radius-lg); margin-bottom: var(--space-5); overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.tab-btn { flex: 1; padding: var(--space-3) var(--space-2); border-radius: var(--radius-md); border: none; font-size: var(--text-sm); font-weight: 600; cursor: pointer; background: transparent; color: var(--stone-500); font-family: inherit; transition: all var(--transition-fast); min-height: 44px; white-space: nowrap; }
-.tab-btn.active { background: var(--stone-0); color: var(--stone-900); box-shadow: var(--shadow-sm); }
-.tab-btn:hover:not(.active) { color: var(--stone-700); background: rgba(255,255,255,0.5); }
-
-/* TEXTAREA */
-.textarea-ar { width: 100%; min-height: 160px; padding: var(--space-4); border-radius: var(--radius-xl); border: 1.5px solid var(--stone-200); resize: vertical; font-family: 'Noto Naskh Arabic', 'Amiri', serif; font-size: var(--text-lg); line-height: 2.2; direction: rtl; color: var(--stone-900); background: var(--stone-0); outline: none; transition: all var(--transition-fast); box-sizing: border-box; }
-.textarea-ar:hover { border-color: var(--stone-300); }
-.textarea-ar:focus { border-color: var(--sage-500); box-shadow: var(--shadow-glow); }
-.textarea-ar::placeholder { color: var(--stone-400); opacity: 0.7; }
-.word-count { display: inline-flex; align-items: center; gap: 4px; background: var(--stone-900); color: white; font-size: var(--text-xs); font-weight: 700; padding: 4px 12px; border-radius: var(--radius-full); }
-
-/* PHRASE CHIPS */
-.phrase-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.phrase-chip { padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); background: var(--stone-0); border: 1px solid var(--stone-200); font-size: var(--text-sm); cursor: pointer; font-family: inherit; transition: all var(--transition-fast); min-height: 40px; display: inline-flex; align-items: center; }
-.phrase-chip:hover { background: var(--sage-50); border-color: var(--sage-300); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-
-/* FAQ */
-.faq-item { border: 1px solid var(--stone-200); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition-fast); }
-.faq-item:hover { border-color: var(--stone-300); }
-.faq-btn { width: 100%; text-align: left; padding: var(--space-3) var(--space-4); border: none; background: var(--stone-0); font-size: var(--text-sm); font-weight: 600; cursor: pointer; color: var(--stone-900); font-family: inherit; display: flex; justify-content: space-between; align-items: center; min-height: 48px; transition: background var(--transition-fast); }
-.faq-btn:hover { background: var(--stone-50); }
-.faq-btn[aria-expanded="true"] { background: var(--sage-50); color: var(--sage-700); }
-.faq-icon { font-size: 18px; flex-shrink: 0; transition: transform var(--transition-fast); }
-.faq-btn[aria-expanded="true"] .faq-icon { transform: rotate(45deg); }
-.faq-ans { padding: 0 var(--space-4) var(--space-3); font-size: var(--text-sm); color: var(--stone-600); line-height: 1.6; display: none; }
-.faq-ans.open { display: block; animation: fade-in 0.2s ease; }
-
-/* DASHBOARD */
-.dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
-.dashboard-card { background: var(--stone-0); border: 1px solid var(--stone-200); border-radius: var(--radius-xl); padding: var(--space-5); transition: var(--transition-fast); }
-.dashboard-card:hover { border-color: var(--stone-300); box-shadow: var(--shadow-md); }
-.dashboard-label { font-size: var(--text-xs); color: var(--stone-500); font-weight: 500; margin: 0 0 var(--space-2); text-transform: uppercase; letter-spacing: 0.05em; }
-.dashboard-value { font-size: var(--text-lg); font-weight: 700; margin: 0; color: var(--sage-600); }
-
-/* COMPLETION */
-.completion-hero { width: 80px; height: 80px; border-radius: var(--radius-xl); background: var(--sage-500); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4); font-size: 2.5rem; box-shadow: var(--shadow-lg); animation: bounce-in 0.5s cubic-bezier(0.34, 1.2, 0.64, 1); }
-
-/* A11Y BAR */
-.a11y-bar { position: fixed; bottom: var(--space-5); right: var(--space-5); z-index: 30; display: flex; flex-direction: column; gap: var(--space-2); }
-.a11y-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--stone-0); border: 1.5px solid var(--stone-200); color: var(--stone-600); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: var(--shadow-md); transition: all var(--transition-fast); }
-.a11y-btn:hover { background: var(--sage-50); border-color: var(--sage-300); color: var(--sage-600); transform: scale(1.1); }
-
-/* VOCAB */
-.vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-2); }
-.vocab-card { background: var(--stone-0); border: 1px solid var(--stone-200); border-radius: var(--radius-lg); padding: var(--space-3); display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-1); transition: all var(--transition-fast); cursor: pointer; }
-.vocab-card:hover { border-color: var(--sage-400); background: var(--sage-50); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.vocab-ar { font-size: var(--text-xl); font-weight: 700; color: var(--stone-900); }
-.vocab-ms { font-size: var(--text-sm); color: var(--stone-500); font-weight: 500; }
-
-/* ANIMATIONS */
-@keyframes modal-in { from { opacity: 0; transform: scale(0.96) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-@keyframes sheet-up { from { transform: translateY(100%); opacity: 0.5; } to { transform: translateY(0); opacity: 1; } }
-@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.9); } }
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes bounce-in { 0% { opacity: 0; transform: scale(0.3); } 50% { transform: scale(1.05); } 70% { transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
-@keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.animate-in { animation: slide-up 0.5s ease forwards; }
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  :root { --header-height: 56px; }
-  .nav-grid { grid-template-columns: 1fr 1fr; gap: var(--space-2); }
-  .nav-card { padding: var(--space-4); }
-  .dashboard-grid { grid-template-columns: 1fr 1fr; }
-  .dialog-box { max-height: 95vh; border-radius: var(--radius-xl); }
-  .dialog-header, .dialog-body, .dialog-footer { padding: var(--space-4); }
-  .vocab-grid { grid-template-columns: repeat(2, 1fr); }
-  .a11y-bar { bottom: var(--space-3); right: var(--space-3); }
-  .audio-player-content { padding: var(--space-4); }
-  .voice-recorder-card { padding: var(--space-4); }
-  .voice-record-btn { width: 80px; height: 80px; font-size: 32px; }
-}
-@media (max-width: 480px) {
-  .nav-grid { grid-template-columns: 1fr; }
-  .dashboard-grid { grid-template-columns: 1fr; }
-  .header-actions .badge-lang { display: none; }
-  .step-num { width: 36px; height: 36px; font-size: var(--text-sm); }
-  .tab-group { gap: 2px; padding: 2px; }
-  .tab-btn { padding: var(--space-2) var(--space-1); font-size: var(--text-xs); min-height: 40px; }
-}
-@media (min-width: 1024px) { .nav-grid { grid-template-columns: repeat(4, 1fr); } }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-  html { scroll-behavior: auto; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eModul IKBAR V6.2 - Voice Edition (Updated)</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { background-color: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 50px; }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        header p { opacity: 0.9; font-size: 0.9rem; }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Cards & Sections */
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-2px); }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--primary); color: white; width: 100%; font-size: 1.1rem; padding: 15px; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--secondary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Navigation Steps */
+        .step-container { display: none; animation: fadeIn 0.5s; }
+        .step-container.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Inputs */
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        input:focus, textarea:focus { outline: 2px solid var(--primary); border-color: transparent; }
+
+        /* Voice Controls */
+        .voice-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 15px;
+            padding: 15px;
+            background: #eff6ff;
+            border-radius: 8px;
+        }
+        .record-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--danger);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+            transition: transform 0.2s;
+        }
+        .record-btn.recording { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* Audio List Items */
+        .audio-item {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .audio-item strong { color: var(--primary); }
+        .audio-item audio { width: 100%; margin-top: 5px; }
+
+        /* Progress Bar */
+        .progress-wrapper { margin-top: 10px; }
+        .progress-bar { height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--secondary); width: 0%; transition: width 0.3s; }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.4rem; }
+            .voice-controls { flex-direction: column; }
+            .record-btn { width: 100%; border-radius: 8px; height: 50px; }
+        }
+    </style>
 </head>
-
 <body>
-<!-- A11Y BAR -->
-<div class="a11y-bar" role="toolbar" aria-label="Tetapan kebolehcapaian">
-  <button class="a11y-btn" onclick="toggleTheme()" title="Tukar tema" aria-label="Tukar tema">🌓</button>
-  <button class="a11y-btn" onclick="adjustFontSize(1)" title="Besarkan teks" aria-label="Besarkan teks">A+</button>
-  <button class="a11y-btn" onclick="adjustFontSize(-1)" title="Kecilkan teks" aria-label="Kecilkan teks">A−</button>
-  <button class="a11y-btn" onclick="toggleHighContrast()" title="Kontras tinggi" aria-label="Kontras tinggi">◐</button>
-</div>
 
-<!-- HELP -->
-<div class="help-bg" id="help-bg" onclick="closeHelp()" role="presentation"></div>
-<div class="help-panel" id="help-panel" role="dialog" aria-modal="true" aria-labelledby="help-title">
-  <div class="help-sheet">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-5);">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:40px;height:40px;border-radius:var(--radius-lg);background:var(--sage-500);display:flex;align-items:center;justify-content:center;"><span style="color:white;font-size:20px;">?</span></div>
-        <h3 id="help-title" style="margin:0;font-size:var(--text-lg);font-weight:700;">Pusat Bantuan</h3>
-      </div>
-      <button class="btn-icon" onclick="closeHelp()" aria-label="Tutup bantuan">✕</button>
-    </div>
-    <div style="margin-bottom:var(--space-5);">
-      <p style="font-size:var(--text-xs);font-weight:700;color:var(--sage-500);text-transform:uppercase;letter-spacing:0.07em;margin:0 0 var(--space-3);">Cara Guna eModul Ini</p>
-      <div style="display:flex;flex-direction:column;gap:var(--space-3);" role="list">
-        <div style="display:flex;gap:12px;align-items:flex-start;" role="listitem">
-          <div style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--sage-500);color:white;display:flex;align-items:center;justify-content:center;font-size:var(--text-xs);font-weight:700;flex-shrink:0;">1</div>
-          <div>
-            <p style="font-size:var(--text-sm);font-weight:600;margin:0 0 2px;color:var(--stone-900);">INPUT</p>
-            <p style="font-size:var(--text-xs);color:var(--stone-500);margin:0;line-height:1.5;">Dengar audio khutbah dan baca transkrip. Tekan perkataan Arab untuk lihat terjemahan dan dengar sebutan.</p>
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:flex-start;" role="listitem">
-          <div style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--sage-400);color:white;display:flex;align-items:center;justify-content:center;font-size:var(--text-xs);font-weight:700;flex-shrink:0;">2</div>
-          <div>
-            <p style="font-size:var(--text-sm);font-weight:600;margin:0 0 2px;color:var(--stone-900);">PROSES KBAT</p>
-            <p style="font-size:var(--text-xs);color:var(--stone-500);margin:0;line-height:1.5;">Susun kad Arab ke ruangan SEBAB atau AKIBAT. Pada telefon: tekan kad untuk pilih, kemudian tekan ruangan untuk letak.</p>
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:flex-start;" role="listitem">
-          <div style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--gold-500);color:white;display:flex;align-items:center;justify-content:center;font-size:var(--text-xs);font-weight:700;flex-shrink:0;">3</div>
-          <div>
-            <p style="font-size:var(--text-sm);font-weight:600;margin:0 0 2px;color:var(--stone-900);">OUTPUT</p>
-            <p style="font-size:var(--text-xs);color:var(--stone-500);margin:0;line-height:1.5;">Pilih: Tulis hujah, jawab kuiz, atau rakam ucapan bahasa Arab (Latihan Bertutur).</p>
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:flex-start;" role="listitem">
-          <div style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--stone-700);color:white;display:flex;align-items:center;justify-content:center;font-size:var(--text-xs);font-weight:700;flex-shrink:0;">4</div>
-          <div>
-            <p style="font-size:var(--text-sm);font-weight:600;margin:0 0 2px;color:var(--stone-900);">REFLEKSI RABBANI</p>
-            <p style="font-size:var(--text-xs);color:var(--stone-500);margin:0;line-height:1.5;">Tulis refleksi peribadi dalam bahasa Arab atau Melayu. Guna butang frasa pantas. Minimum 5 aksara.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div style="margin-bottom:var(--space-5);">
-      <p style="font-size:var(--text-xs);font-weight:700;color:var(--sage-500);text-transform:uppercase;letter-spacing:0.07em;margin:0 0 var(--space-3);">Soalan Lazim</p>
-      <div id="faq-list" style="display:flex;flex-direction:column;gap:8px;" role="list"></div>
-    </div>
-    <div class="card" style="padding:var(--space-4);">
-      <p style="font-size:var(--text-xs);font-weight:700;color:var(--sage-500);text-transform:uppercase;letter-spacing:0.07em;margin:0 0 var(--space-3);">Simpan & Muat Semula Kemajuan</p>
-      <p style="font-size:var(--text-sm);color:var(--stone-600);margin:0 0 var(--space-3);line-height:1.5;">Export kemajuan anda sebagai fail JSON untuk simpan di luar talian. Import semula bila perlu.</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-secondary btn-sm" onclick="exportProgress()"><span>💾</span> Export Kemajuan</button>
-        <label class="btn btn-secondary btn-sm" style="cursor:pointer;"><span>📂</span> Import Kemajuan<input type="file" accept=".json" onchange="importProgress(event)" style="display:none;" aria-label="Import fail kemajuan"></label>
-      </div>
-    </div>
-    <div style="margin-top:var(--space-4);text-align:center;">
-      <button class="btn btn-secondary btn-sm" onclick="closeHelp();startTour();">🗺️ Mulakan Panduan Interaktif Semula</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOUR -->
-<div class="tour-overlay" id="tour-overlay" role="presentation"></div>
-<div class="tour-bubble" id="tour-bubble" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="tour-title">
-  <p style="font-size:var(--text-xs);font-weight:700;color:var(--sage-500);text-transform:uppercase;letter-spacing:0.07em;margin:0 0 4px;" id="tour-step-label">Langkah 1 / 5</p>
-  <p style="font-size:var(--text-base);font-weight:700;margin:0 0 6px;color:var(--stone-900);" id="tour-title"></p>
-  <p style="font-size:var(--text-sm);color:var(--stone-600);margin:0 0 var(--space-4);line-height:1.5;" id="tour-body"></p>
-  <div style="display:flex;justify-content:space-between;align-items:center;">
-    <button class="btn btn-secondary btn-sm" onclick="skipTour()">Langkau</button>
-    <button class="btn btn-primary btn-sm" onclick="nextTour()" id="tour-next-btn">Seterusnya →</button>
-  </div>
-</div>
-
-<!-- HEADER -->
-<header class="app-header" id="main-header">
-  <div class="container header-inner">
-    <a href="#" class="brand" onclick="event.preventDefault(); window.scrollTo({top:0,behavior:'smooth'});">
-      <div class="brand-mark"><span class="ar" style="color:white;font-size:var(--text-lg);font-weight:700;">اكبار</span></div>
-      <div class="brand-text">
-        <div class="brand-title">eModul IKBAR</div>
-        <div class="brand-version">V6.2 · Voice Edition</div>
-      </div>
-    </a>
-    <div class="header-actions">
-      <div class="badge-lang" aria-label="Mod dwibahasa"><span class="badge-pulse" aria-hidden="true"></span>50% Arab · 50% Melayu</div>
-      <button id="btn-help" class="btn-icon" onclick="openHelp()" title="Bantuan" aria-label="Buka pusat bantuan"><span aria-hidden="true">?</span></button>
-      <button class="btn btn-secondary btn-sm" onclick="resetProgress()" aria-label="Reset kemajuan">Reset</button>
-    </div>
-  </div>
+<header>
+    <h1>eModul IKBAR V6.2</h1>
+    <p>Voice Edition & Audio Upload Integration</p>
 </header>
 
-<!-- MAIN -->
-<main class="container" style="padding-top:var(--space-6);padding-bottom:var(--space-12);">
+<div class="container">
 
-  <!-- GATE -->
-  <div id="gate-modal" class="gate-modal" role="dialog" aria-modal="true" aria-labelledby="gate-heading">
-    <div class="gate-box">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:var(--space-4);">
-        <div style="width:48px;height:48px;border-radius:var(--radius-xl);background:var(--success-500);display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+    <!-- STEP 1: PENDAHULUAN -->
+    <div id="step1" class="step-container active">
+        <div class="card">
+            <h2 class="section-title">👋 Selamat Datang</h2>
+            <p>Sila masukkan nama anda untuk memulakan sesi pembelajaran interaktif ini.</p>
+            <br>
+            <label>Nama Pelajar:</label>
+            <input type="text" id="studentName" placeholder="Cth: Ahmad Albab">
+            <button class="btn btn-primary" onclick="goToStep(2)">Teruskan ke Input 🚀</button>
         </div>
-        <div>
-          <h3 id="gate-heading" style="font-weight:700;font-size:var(--text-lg);margin:0;">Gerbang Keaslian Kandungan</h3>
-          <p style="font-size:var(--text-xs);color:var(--stone-500);margin:0;">C1-04 & C5-01 · DPRK Prinsip 9 · KKM 2026</p>
-        </div>
-      </div>
-      <p style="font-size:var(--text-sm);color:var(--stone-700);line-height:1.6;margin:0 0 var(--space-4);">Teks Arab dalam modul ini telah disahkan oleh <strong>Panel Syariah KIAS</strong> pada 15 Mac 2026. Sumber: al-Quran, Sahih al-Bukhari, dan kitab turath muktabar.</p>
-      <div style="display:flex;align-items:center;gap:8px;padding:var(--space-3) var(--space-4);border-radius:var(--radius-lg);background:var(--success-50);border:1px solid var(--success-500);margin-bottom:var(--space-5);">
-        <span style="color:var(--success-600);font-size:var(--text-xs);font-weight:600;">✓ Disahkan · ✓ Sahih · ✓ Patuh DPRK</span>
-      </div>
-      <div class="input-group">
-        <label class="input-label" for="gate-nama">Nama Penuh Pelajar</label>
-        <input id="gate-nama" type="text" placeholder="Cth: Ahmad bin Abdullah" class="input-field" autocomplete="name" aria-required="true">
-        <p id="gate-nama-err" class="input-error">Sila masukkan nama penuh anda.</p>
-      </div>
-      <div class="input-group">
-        <label class="input-label" for="gate-matrik">Nombor Matrik</label>
-        <input id="gate-matrik" type="text" placeholder="Cth: 2024ABC001" class="input-field" autocomplete="off" aria-required="true">
-        <p id="gate-matrik-err" class="input-error">Sila masukkan nombor matrik anda.</p>
-      </div>
-      <button onclick="dismissGate()" class="btn btn-primary" style="width:100%;">Teruskan ke INPUT →</button>
     </div>
-  </div>
 
-  <!-- INTRO -->
-  <section style="margin-bottom:var(--space-6);" class="animate-in">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;">
-      <div style="flex:1;min-width:280px;">
-        <p style="font-size:var(--text-sm);font-weight:600;color:var(--sage-500);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 var(--space-2);">Akidah · CLO 1, 2, 3</p>
-        <h1 style="font-size:var(--text-3xl);font-weight:800;margin:0 0 var(--space-2);color:var(--stone-900);line-height:1.2;">Syirik: Jenis, Sebab dan Cara Pencegahan</h1>
-        <p class="ar" style="font-size:var(--text-2xl);color:var(--stone-600);margin:0;">الشِّرْكُ: أَنْوَاعُهُ وَأَسْبَابُهُ وَطُرُقُ الْوِقَايَةِ مِنْهُ</p>
-      </div>
-      <div id="prog-card" class="card" style="flex-shrink:0;min-width:160px;padding:var(--space-4);">
-        <p style="font-size:var(--text-xs);color:var(--stone-500);margin:0 0 var(--space-2);">Kemajuan Modul</p>
-        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
-          <div class="progress-ring">
-            <svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true">
-              <circle class="progress-ring-bg" cx="30" cy="30" r="26"/>
-              <circle class="progress-ring-fill" id="prog-ring-fill" cx="30" cy="30" r="26" stroke-dasharray="163.36" stroke-dashoffset="163.36"/>
-            </svg>
-            <span class="progress-text" id="prog-pct">0%</span>
-          </div>
-        </div>
-        <div class="step-dots" id="step-dots" role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" aria-label="Kemajuan langkah">
-          <div class="step-dot" style="flex:1;"></div><div class="step-dot" style="flex:1;"></div>
-          <div class="step-dot" style="flex:1;"></div><div class="step-dot" style="flex:1;"></div>
-        </div>
-      </div>
-    </div>
-  </section>
+    <!-- STEP 2: INPUT & RAKAMAN -->
+    <div id="step2" class="step-container">
+        <div class="card">
+            <h2 class="section-title">📝 Input & Rakaman Suara</h2>
+            <p>Sila jawab soalan berikut secara bertulis atau rakaman suara.</p>
+            
+            <label>Soalan: Apakah kepentingan biodiversiti?</label>
+            <textarea id="answerText" rows="4" placeholder="Tulis jawapan anda di sini..."></textarea>
 
-  <!-- CLO -->
-  <section class="card" style="margin-bottom:var(--space-6);">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:var(--space-4);padding-bottom:var(--space-4);border-bottom:1px solid var(--stone-100);">
-      <div style="display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:var(--radius-full);background:var(--stone-100);border:1px solid var(--stone-200);"><span style="font-size:var(--text-xs);font-weight:600;color:var(--stone-500);text-transform:uppercase;">Tahap</span><span style="font-size:var(--text-sm);font-weight:700;color:var(--stone-900);">2</span></div>
-      <div style="display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:var(--radius-full);background:var(--stone-100);border:1px solid var(--stone-200);"><span style="font-size:var(--text-xs);font-weight:600;color:var(--stone-500);text-transform:uppercase;">Minggu</span><span style="font-size:var(--text-sm);font-weight:700;color:var(--stone-900);">4</span></div>
-      <div style="display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:var(--radius-full);background:var(--sage-50);border:1px solid var(--sage-200);"><span style="font-size:var(--text-xs);font-weight:600;color:var(--sage-600);text-transform:uppercase;">Bidang</span><span style="font-size:var(--text-sm);font-weight:700;color:var(--sage-600);">Akidah</span></div>
-      <div style="display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:var(--radius-full);background:var(--warning-50);border:1px solid var(--warning-500);"><span style="font-size:var(--text-xs);font-weight:600;color:var(--warning-600);text-transform:uppercase;">Pendekatan</span><span style="font-size:var(--text-sm);font-weight:700;color:var(--warning-600);">Soft-CLIL</span></div>
-    </div>
-    <p style="font-size:var(--text-xs);font-weight:700;color:var(--stone-500);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 var(--space-4);">Hasil Pembelajaran Kursus (CLO)</p>
-    <div style="display:flex;flex-direction:column;gap:var(--space-3);">
-      <div style="display:flex;align-items:flex-start;gap:10px;"><span style="flex-shrink:0;padding:3px 10px;border-radius:var(--radius-full);background:var(--stone-900);color:white;font-size:var(--text-xs);font-weight:700;margin-top:2px;">CLO 1</span><p style="font-size:var(--text-sm);color:var(--stone-700);margin:0;line-height:1.6;">Menerangkan konsep syirik dari bidang Akidah dalam bahasa Arab. <span style="color:var(--stone-400);">(C2–C3)</span></p></div>
-      <div style="display:flex;align-items:flex-start;gap:10px;"><span style="flex-shrink:0;padding:3px 10px;border-radius:var(--radius-full);background:var(--sage-500);color:white;font-size:var(--text-xs);font-weight:700;margin-top:2px;">CLO 2</span><p style="font-size:var(--text-sm);color:var(--stone-700);margin:0;line-height:1.6;">Membincangkan jenis, sebab dan cara pencegahan syirik menggunakan kosa kata amaran dan struktur sebab-akibat. <span style="color:var(--stone-400);">(C3–C4)</span></p></div>
-      <div style="display:flex;align-items:flex-start;gap:10px;"><span style="flex-shrink:0;padding:3px 10px;border-radius:var(--radius-full);background:var(--sage-100);color:var(--sage-800);font-size:var(--text-xs);font-weight:700;margin-top:2px;">CLO 3</span><p style="font-size:var(--text-sm);color:var(--stone-700);margin:0;line-height:1.6;">Menganalisis nilai Islam melalui dalil autentik dan menghubungkannya dengan pengalaman kehidupan Muslim semasa. <span style="color:var(--stone-400);">(C4)</span></p></div>
-    </div>
-  </section>
-
-  <!-- NAV -->
-  <nav aria-label="Navigasi langkah pembelajaran">
-    <div class="nav-grid" style="margin-bottom:var(--space-8);" id="nav-grid">
-      <button class="nav-card" id="card-1" data-step="1" onclick="handleNav(1)" aria-label="Langkah 1: INPUT">
-        <div class="step-num" style="background:var(--sage-500);">1</div>
-        <div class="nav-title">INPUT</div>
-        <div class="nav-desc">Dengar khutbah dan fahami dalil</div>
-        <div class="live-indicator" aria-hidden="true"></div>
-      </button>
-      <button class="nav-card locked" id="card-2" data-step="2" onclick="handleNav(2)" aria-label="Langkah 2: PROSES KBAT" aria-disabled="true">
-        <div class="step-num" style="background:var(--sage-400);">2</div>
-        <div class="nav-title">PROSES KBAT</div>
-        <div class="nav-desc">Susun sebab-akibat syirik</div>
-      </button>
-      <button class="nav-card locked" id="card-3" data-step="3" onclick="handleNav(3)" aria-label="Langkah 3: OUTPUT" aria-disabled="true">
-        <div class="step-num" style="background:var(--gold-500);">3</div>
-        <div class="nav-title">OUTPUT</div>
-        <div class="nav-desc">Tulis, kuiz & rakam suara</div>
-      </button>
-      <button class="nav-card locked" id="card-4" data-step="4" onclick="handleNav(4)" aria-label="Langkah 4: REFLEKSI RABBANI" aria-disabled="true">
-        <div class="step-num" style="background:var(--stone-700);">4</div>
-        <div class="nav-title">REFLEKSI RABBANI</div>
-        <div class="nav-desc">Hubungkan dalil dengan diri</div>
-      </button>
-    </div>
-  </nav>
-
-  <!-- DASHBOARD -->
-  <section aria-labelledby="dash-heading">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);flex-wrap:wrap;gap:8px;">
-      <h2 id="dash-heading" style="font-size:var(--text-lg);font-weight:700;margin:0;">Papan Pemuka Pelajar</h2>
-      <span style="font-size:var(--text-xs);padding:4px 12px;border-radius:var(--radius-full);background:var(--sage-50);color:var(--sage-600);font-weight:600;">Minggu 4 · Akidah: Syirik</span>
-    </div>
-    <div class="dashboard-grid">
-      <div class="dashboard-card">
-        <p class="dashboard-label">Status Semasa</p>
-        <p id="dash-status" style="font-size:var(--text-lg);font-weight:700;margin:0;color:var(--sage-600);">Belum Mula</p>
-        <p style="font-size:var(--text-xs);color:var(--stone-400);margin:var(--space-2) 0 0;">Klik INPUT untuk mula</p>
-      </div>
-      <div class="dashboard-card">
-        <p class="dashboard-label">Kemahiran KBAT</p>
-        <p style="font-size:var(--text-lg);font-weight:700;margin:0;color:var(--sage-600);">Menganalisis</p>
-        <div style="display:flex;gap:4px;margin-top:var(--space-2);">
-          <span style="font-size:var(--text-xs);padding:2px 8px;border-radius:var(--radius-full);background:var(--stone-900);color:white;font-weight:600;">C1</span>
-          <span style="font-size:var(--text-xs);padding:2px 8px;border-radius:var(--radius-full);background:var(--sage-500);color:white;font-weight:600;outline:2px solid var(--sage-200);">C4</span>
-          <span style="font-size:var(--text-xs);padding:2px 8px;border-radius:var(--radius-full);background:var(--stone-200);color:var(--stone-500);font-weight:600;">C5</span>
-        </div>
-      </div>
-      <div class="dashboard-card">
-        <p class="dashboard-label">Refleksi Rabbani</p>
-        <p id="refleksi-preview" style="font-size:var(--text-sm);color:var(--stone-600);margin:0;font-style:italic;line-height:1.5;">(Belum ada refleksi)</p>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<!-- ============================================
-     MODAL 1: INPUT
-     ============================================ -->
-<div class="dialog-overlay" id="modal-1" role="dialog" aria-modal="true" aria-labelledby="modal1-title">
-  <div class="dialog-box" style="max-width:680px;">
-    <div class="dialog-header">
-      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
-        <div style="width:36px;height:36px;border-radius:var(--radius-md);background:var(--sage-500);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:var(--text-sm);flex-shrink:0;">1</div>
-        <h3 id="modal1-title" style="margin:0;font-size:var(--text-base);font-weight:700;">INPUT</h3>
-        <span style="font-size:var(--text-xs);padding:3px 10px;border-radius:var(--radius-full);background:var(--warning-50);color:var(--warning-600);font-weight:600;white-space:nowrap;">C1–C2</span>
-      </div>
-      <button class="btn-icon" onclick="closeModal(1)" aria-label="Tutup dialog">✕</button>
-    </div>
-    <div class="dialog-body">
-
-      <!-- AUDIO PLAYER -->
-      <div class="audio-player-container" role="region" aria-label="Pemain audio khutbah syirik">
-        <img class="audio-player-bg" src="https://images.unsplash.com/photo-1543872084-c7bd3822856f?q=80&w=1200&auto=format" alt="" aria-hidden="true">
-        <audio id="khutbah-audio" preload="metadata" style="display:none;">
-          <source src="audio/khutbah-syirik.mp3" type="audio/mpeg">
-          <source src="audio/khutbah-syirik.ogg" type="audio/ogg">
-        </audio>
-        <div class="audio-player-content">
-          <div class="audio-player-title">
-            <span class="ar">خُطْبَةٌ عَنِ الشِّرْكِ</span>
-            <span>Khutbah tentang Syirik · Dengar dan fahami</span>
-          </div>
-          <button id="audio-main-btn" class="audio-main-btn" onclick="toggleAudio()" aria-label="Main audio khutbah">
-            <svg id="icon-play" width="32" height="32" viewBox="0 0 24 24" fill="#5C7A4E"><path d="M8 5v14l11-7z"/></svg>
-            <svg id="icon-pause" width="32" height="32" viewBox="0 0 24 24" fill="#5C7A4E" style="display:none;"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
-          </button>
-          <div class="audio-progress-area">
-            <span class="audio-time" id="audio-current">00:00</span>
-            <div class="audio-progress-track" id="audio-track" onclick="seekAudio(event)">
-              <div class="audio-progress-fill" id="audio-fill"></div>
-            </div>
-            <span class="audio-time" id="audio-total">00:00</span>
-          </div>
-          <div class="audio-controls-row">
-            <button class="audio-ctrl-btn" onclick="skipAudio(-10)" title="Undur 10 saat" aria-label="Undur 10 saat">⏪</button>
-            <button class="audio-ctrl-btn" onclick="toggleAudio()" title="Main/Jeda" aria-label="Main atau jeda audio">⏯</button>
-            <button class="audio-ctrl-btn" onclick="skipAudio(10)" title="Maju 10 saat" aria-label="Maju 10 saat">⏩</button>
-            <button class="audio-ctrl-btn" onclick="speakFullAyat()" title="Baca guna TTS" aria-label="Baca ayat guna text to speech">🔊</button>
-          </div>
-          <div class="audio-badge-row">
-            <span class="audio-badge">🎧 Audio Khutbah</span>
-            <span class="audio-badge">Tahap 2</span>
-            <span class="audio-badge">Dwibahasa</span>
-          </div>
-          <div id="audio-fallback" class="audio-fallback-notice" style="display:none;">
-            <p>⚠️ Fail audio tidak dijumpa. Anda boleh:</p>
-            <button onclick="speakFullAyat()">🔊 Dengar guna TTS</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Objective -->
-      <div style="background:var(--sage-50);border:1px solid var(--sage-200);border-radius:var(--radius-xl);padding:var(--space-4);margin-bottom:var(--space-5);">
-        <p style="font-size:var(--text-xs);font-weight:700;color:var(--sage-600);margin:0 0 var(--space-3);text-transform:uppercase;letter-spacing:0.06em;">Objektif INPUT</p>
-        <ul style="margin:0;padding-left:var(--space-5);font-size:var(--text-sm);color:var(--stone-700);line-height:1.8;" role="list">
-          <li>Dengar audio khutbah untuk faham sebutan dan tajwid</li>
-          <li>Kenal pasti kosa kata amaran dan nasihat tentang syirik</li>
-          <li>Fahami struktur sebab-akibat dalam bahasa Arab</li>
-        </ul>
-      </div>
-
-      <!-- Tooltip hint -->
-      <div style="background:var(--warning-50);border:1px solid var(--warning-500);border-radius:var(--radius-lg);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-4);font-size:var(--text-sm);color:var(--warning-600);display:flex;align-items:center;gap:8px;" role="note">
-        <span style="font-size:var(--text-lg);" aria-hidden="true">👆</span>
-        <span>Tekan perkataan Arab untuk lihat terjemahan dan dengar sebutan. Tekan 🔊 untuk dengar ayat penuh.</span>
-      </div>
-
-      <!-- Transkrip -->
-      <div style="margin-bottom:var(--space-5);">
-        <p style="font-size:var(--text-sm);font-weight:600;color:var(--stone-700);margin:0 0 var(--space-3);">Transkrip Khutbah</p>
-        <div class="surface-elevated" style="padding:var(--space-5);">
-
-          <article style="margin-bottom:var(--space-4);">
-            <p style="font-size:var(--text-xs);font-weight:600;color:var(--gold-500);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 var(--space-2);">Dalil Utama (Luqman: 13)</p>
-            <p class="ar" style="font-size:var(--text-2xl);line-height:2.4;color:var(--stone-900);text-align:right;margin:0;">
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button" aria-label="Sesungguhnya">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('إِنَّ')" aria-label="Dengar sebutan: إِنَّ">🔊</button>
-                إِنَّ<span class="tip-box">Sesungguhnya</span>
-              </span>
-              <span> </span>
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button" aria-label="syirik itu">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('الشِّرْكَ')" aria-label="Dengar sebutan: الشِّرْكَ">🔊</button>
-                الشِّرْكَ<span class="tip-box">syirik itu</span>
-              </span>
-              <span> </span>
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button" aria-label="ialah kezaliman">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('لَظُلْمٌ')" aria-label="Dengar sebutan: لَظُلْمٌ">🔊</button>
-                لَظُلْمٌ<span class="tip-box">ialah kezaliman</span>
-              </span>
-              <span> </span>
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button" aria-label="yang amat besar">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('عَظِيمٌ')" aria-label="Dengar sebutan: عَظِيمٌ">🔊</button>
-                عَظِيمٌ<span class="tip-box">yang amat besar</span>
-              </span>
-            </p>
-            <p style="font-size:var(--text-sm);color:var(--stone-600);margin:4px 0 0;text-align:right;">Sesungguhnya syirik itu adalah kezaliman yang amat besar.</p>
-          </article>
-
-          <hr style="border:none;border-top:1px solid var(--stone-100);margin:var(--space-4) 0;">
-
-          <article style="margin-bottom:var(--space-4);">
-            <p style="font-size:var(--text-xs);font-weight:600;color:var(--gold-500);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 var(--space-2);">Punca Syirik</p>
-            <p class="ar" style="font-size:var(--text-xl);line-height:2.2;color:var(--stone-900);text-align:right;margin:0;">
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('سَبَبُ')" aria-label="Dengar sebutan">🔊</button>
-                سَبَبُ<span class="tip-box">punca / sebab</span>
-              </span>
-              <span> </span>
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('الشِّرْكِ')" aria-label="Dengar sebutan">🔊</button>
-                الشِّرْكِ<span class="tip-box">syirik</span>
-              </span>
-              <span> </span>
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('هُوَ')" aria-label="Dengar sebutan">🔊</button>
-                هُوَ<span class="tip-box">ialah</span>
-              </span>
-              <span> </span>
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('الْجَهْلُ')" aria-label="Dengar sebutan">🔊</button>
-                الْجَهْلُ<span class="tip-box">kejahilan</span>
-              </span>
-              <span> </span>
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('وَالتَّقْلِيدُ الْأَعْمَى')" aria-label="Dengar sebutan">🔊</button>
-                وَالتَّقْلِيدُ الْأَعْمَى<span class="tip-box">dan ikutan buta</span>
-              </span>
-            </p>
-            <p style="font-size:var(--text-sm);color:var(--stone-600);margin:4px 0 0;text-align:right;">Punca syirik ialah kejahilan dan ikutan yang buta.</p>
-          </article>
-
-          <hr style="border:none;border-top:1px solid var(--stone-100);margin:var(--space-4) 0;">
-
-          <article>
-            <p style="font-size:var(--text-xs);font-weight:600;color:var(--gold-500);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 var(--space-2);">Cara Pencegahan</p>
-            <p class="ar" style="font-size:var(--text-xl);line-height:2.2;color:var(--stone-900);text-align:right;margin:0;">
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('الْوِقَايَةُ')" aria-label="Dengar sebutan">🔊</button>
-                الْوِقَايَةُ<span class="tip-box">pencegahan</span>
-              </span>
-              <span> </span>
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('مِنَ')" aria-label="Dengar sebutan">🔊</button>
-                مِنَ<span class="tip-box">daripada</span>
-              </span>
-              <span> </span>
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('الشِّرْكِ')" aria-label="Dengar sebutan">🔊</button>
-                الشِّرْكِ<span class="tip-box">syirik</span>
-              </span>
-              <span> </span>
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('بِتَعْلِيمِ')" aria-label="Dengar sebutan">🔊</button>
-                بِتَعْلِيمِ<span class="tip-box">melalui pengajaran</span>
-              </span>
-              <span> </span>
-              <span class="word-tooltip" onclick="toggleTip(this)" tabindex="0" role="button">
-                <button class="tts-btn" onclick="event.stopPropagation();speakText('التَّوْحِيدِ')" aria-label="Dengar sebutan">🔊</button>
-                التَّوْحِيدِ<span class="tip-box">tauhid</span>
-              </span>
-            </p>
-            <p style="font-size:var(--text-sm);color:var(--stone-600);margin:4px 0 0;text-align:right;">Pencegahan syirik ialah melalui pengajaran tauhid.</p>
-          </article>
-        </div>
-      </div>
-
-      <!-- Vocabulary -->
-      <section aria-labelledby="vocab-heading">
-        <p id="vocab-heading" style="font-size:var(--text-sm);font-weight:600;color:var(--stone-700);margin:0 0 var(--space-3);">Kosa Kata Utama</p>
-        <div class="vocab-grid">
-          <div class="vocab-card" onclick="speakText('الشِّرْكُ')" tabindex="0" role="button" aria-label="Dengar sebutan: الشِّرْكُ - Syirik">
-            <span class="ar vocab-ar">الشِّرْكُ</span><span class="vocab-ms">Syirik</span>
-          </div>
-          <div class="vocab-card" onclick="speakText('الظُّلْمُ')" tabindex="0" role="button" aria-label="Dengar sebutan: الظُّلْمُ - Kezaliman">
-            <span class="ar vocab-ar">الظُّلْمُ</span><span class="vocab-ms">Kezaliman</span>
-          </div>
-          <div class="vocab-card" onclick="speakText('الْجَهْلُ')" tabindex="0" role="button" aria-label="Dengar sebutan: الْجَهْلُ - Kejahilan">
-            <span class="ar vocab-ar">الْجَهْلُ</span><span class="vocab-ms">Kejahilan</span>
-          </div>
-          <div class="vocab-card" onclick="speakText('التَّوْحِيدُ')" tabindex="0" role="button" aria-label="Dengar sebutan: التَّوْحِيدُ - Tauhid">
-            <span class="ar vocab-ar">التَّوْحِيدُ</span><span class="vocab-ms">Tauhid</span>
-          </div>
-          <div class="vocab-card" onclick="speakText('الْوِقَايَةُ')" tabindex="0" role="button" aria-label="Dengar sebutan: الْوِقَايَةُ - Pencegahan">
-            <span class="ar vocab-ar">الْوِقَايَةُ</span><span class="vocab-ms">Pencegahan</span>
-          </div>
-          <div class="vocab-card" onclick="speakText('التَّقْلِيدُ الْأَعْمَى')" tabindex="0" role="button" aria-label="Dengar sebutan: التَّقْلِيدُ الْأَعْمَى - Taklid buta">
-            <span class="ar vocab-ar">التَّقْلِيدُ الْأَعْمَى</span><span class="vocab-ms">Taklid buta</span>
-          </div>
-        </div>
-      </section>
-    </div>
-    <div class="dialog-footer">
-      <p style="font-size:var(--text-sm);color:var(--stone-400);margin:0;">Selesai mendengar? Tandai untuk buka PROSES KBAT.</p>
-      <button class="btn btn-primary" onclick="completeStep(1)">Tandai Selesai ✓</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL 2: PROSES KBAT -->
-<div class="dialog-overlay" id="modal-2" role="dialog" aria-modal="true" aria-labelledby="modal2-title">
-  <div class="dialog-box" style="max-width:680px;">
-    <div class="dialog-header">
-      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
-        <div style="width:36px;height:36px;border-radius:var(--radius-md);background:var(--sage-400);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:var(--text-sm);flex-shrink:0;">2</div>
-        <h3 id="modal2-title" style="margin:0;font-size:var(--text-base);font-weight:700;">PROSES KBAT</h3>
-        <span style="font-size:var(--text-xs);padding:3px 10px;border-radius:var(--radius-full);background:var(--success-50);color:var(--success-600);font-weight:600;white-space:nowrap;">C4</span>
-      </div>
-      <button class="btn-icon" onclick="closeModal(2)" aria-label="Tutup dialog">✕</button>
-    </div>
-    <div class="dialog-body">
-      <div style="margin-bottom:var(--space-4);">
-        <h4 style="font-size:var(--text-lg);font-weight:700;margin:0 0 4px;">Bina Peta Sebab-Akibat Syirik</h4>
-        <div style="font-size:var(--text-sm);color:var(--stone-500);margin:0;padding:var(--space-3) var(--space-4);background:var(--stone-100);border-radius:var(--radius-md);line-height:1.5;" role="note">
-          <span id="hint-text-mobile" style="display:none;">📱 Tekan kad untuk pilih, kemudian tekan ruangan untuk letak.</span>
-          <span id="hint-text-desktop">🖱️ Seret kad ke ruangan SEBAB atau AKIBAT yang betul.</span>
-        </div>
-      </div>
-      <div style="background:var(--warning-50);border:1px solid var(--warning-500);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-5);">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);">
-          <p style="font-size:var(--text-sm);font-weight:600;color:var(--warning-600);margin:0;">Rangka Ayat Panduan</p>
-          <button onclick="toggleHint()" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="hint-box" id="hint-toggle-btn">Tunjuk / Sorok</button>
-        </div>
-        <div id="hint-box" style="display:none;margin-top:var(--space-3);" role="region" aria-label="Rangka ayat panduan">
-          <p class="ar" style="font-size:var(--text-xl);text-align:right;margin:0;color:var(--stone-900);">يُؤَدِّي <span style="color:var(--gold-500);">...</span> إِلَى <span style="color:var(--gold-500);">...</span></p>
-          <p style="font-size:var(--text-sm);color:var(--stone-700);margin:4px 0 0;"><strong>... membawa kepada ...</strong> Sebab mesti datang sebelum Akibat.</p>
-          <p style="font-size:var(--text-xs);color:var(--stone-400);margin:4px 0 0;">Contoh: الجَهْلُ يُؤَدِّي إِلَى الشِّرْكِ</p>
-        </div>
-      </div>
-      <div style="margin-bottom:var(--space-4);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-2);flex-wrap:wrap;gap:var(--space-2);">
-          <p style="font-size:var(--text-xs);font-weight:700;color:var(--stone-500);text-transform:uppercase;letter-spacing:0.07em;margin:0;">Kad Perkataan</p>
-          <button class="btn btn-secondary btn-sm" onclick="clearZones()" title="Kosongkan semua ruangan"><span style="font-size:14px;">↩</span> Kosongkan Semua</button>
-        </div>
-        <div id="drag-pool" style="display:flex;flex-wrap:wrap;gap:10px;padding:var(--space-3);background:var(--stone-100);border-radius:var(--radius-xl);min-height:70px;" role="list" aria-label="Kad perkataan">
-          <div class="drag-chip word-tooltip" draggable="true" data-word="jahl" onclick="tapSelect(this)" tabindex="0" role="listitem">
-            <div class="chip-inner"><span class="ar" style="font-size:var(--text-lg);">الْجَهْلُ</span></div><span class="tip-box">Kejahilan</span>
-          </div>
-          <div class="drag-chip word-tooltip" draggable="true" data-word="taqlid" onclick="tapSelect(this)" tabindex="0" role="listitem">
-            <div class="chip-inner"><span class="ar" style="font-size:var(--text-lg);">التَّقْلِيدُ الْأَعْمَى</span></div><span class="tip-box">Taklid buta</span>
-          </div>
-          <div class="drag-chip word-tooltip" draggable="true" data-word="hawa" onclick="tapSelect(this)" tabindex="0" role="listitem">
-            <div class="chip-inner"><span class="ar" style="font-size:var(--text-lg);">اتِّبَاعُ الْهَوَى</span></div><span class="tip-box">Ikut hawa nafsu</span>
-          </div>
-          <div class="drag-chip word-tooltip" draggable="true" data-word="shirk" onclick="tapSelect(this)" tabindex="0" role="listitem">
-            <div class="chip-inner"><span class="ar" style="font-size:var(--text-lg);">الشِّرْكُ بِاللَّهِ</span></div><span class="tip-box">Syirik kepada Allah</span>
-          </div>
-          <div class="drag-chip word-tooltip" draggable="true" data-word="dhulm" onclick="tapSelect(this)" tabindex="0" role="listitem">
-            <div class="chip-inner"><span class="ar" style="font-size:var(--text-lg);">الظُّلْمُ الْعَظِيمُ</span></div><span class="tip-box">Kezaliman yang besar</span>
-          </div>
-          <div class="drag-chip word-tooltip" draggable="true" data-word="tawhid" onclick="tapSelect(this)" tabindex="0" role="listitem">
-            <div class="chip-inner"><span class="ar" style="font-size:var(--text-lg);">تَعْلِيمُ التَّوْحِيدِ</span></div><span class="tip-box">Pengajaran Tauhid</span>
-          </div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);">
-        <div>
-          <p style="font-size:var(--text-xs);font-weight:700;color:var(--stone-500);text-transform:uppercase;letter-spacing:0.07em;margin:0 0 6px;">SEBAB</p>
-          <div class="drop-zone" id="drop-sebab" onclick="tapDrop('drop-sebab')" role="list" aria-label="Ruangan sebab" aria-dropeffect="move">
-            <span class="drop-zone-label">Letak kad SEBAB di sini</span>
-          </div>
-        </div>
-        <div>
-          <p style="font-size:var(--text-xs);font-weight:700;color:var(--stone-500);text-transform:uppercase;letter-spacing:0.07em;margin:0 0 6px;">AKIBAT / KESAN</p>
-          <div class="drop-zone" id="drop-akibat" onclick="tapDrop('drop-akibat')" role="list" aria-label="Ruangan akibat" aria-dropeffect="move">
-            <span class="drop-zone-label">Letak kad AKIBAT di sini</span>
-          </div>
-        </div>
-      </div>
-      <p style="font-size:var(--text-xs);color:var(--stone-400);margin:var(--space-2) 0 0;">Nota: Konsep dalam bahasa Arab, arahan dalam bahasa Melayu.</p>
-    </div>
-    <div class="dialog-footer">
-      <p style="font-size:var(--text-sm);color:var(--stone-400);margin:0;">Seret atau tekan sekurang-kurangnya 1 kad ke setiap ruangan.</p>
-      <button class="btn btn-primary" onclick="completeStep(2)">Simpan Peta ✓</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================
-     MODAL 3: OUTPUT (DENGAN VOICE RECORDER V6.2)
-     ============================================ -->
-<div class="dialog-overlay" id="modal-3" role="dialog" aria-modal="true" aria-labelledby="modal3-title">
-  <div class="dialog-box" style="max-width:680px;">
-    <div class="dialog-header">
-      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
-        <div style="width:36px;height:36px;border-radius:var(--radius-md);background:var(--gold-500);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:var(--text-sm);flex-shrink:0;">3</div>
-        <h3 id="modal3-title" style="margin:0;font-size:var(--text-base);font-weight:700;">OUTPUT</h3>
-        <span style="font-size:var(--text-xs);padding:3px 10px;border-radius:var(--radius-full);background:var(--warning-50);color:var(--warning-600);font-weight:600;white-space:nowrap;">C3 + C5</span>
-      </div>
-      <button class="btn-icon" onclick="closeModal(3)" aria-label="Tutup dialog">✕</button>
-    </div>
-    <div class="dialog-body">
-      <div class="tab-group" role="tablist" aria-label="Pilihan output">
-        <button id="tab-tulis" class="tab-btn active" onclick="switchTab('tulis')" role="tab" aria-selected="true" aria-controls="panel-tulis">Tulis Hujah</button>
-        <button id="tab-kuiz" class="tab-btn" onclick="switchTab('kuiz')" role="tab" aria-selected="false" aria-controls="panel-kuiz">Kuiz</button>
-        <button id="tab-voice" class="tab-btn" onclick="switchTab('voice')" role="tab" aria-selected="false" aria-controls="panel-voice">🎙️ Latihan Bertutur</button>
-      </div>
-
-      <!-- Tab: Tulis Hujah -->
-      <div id="panel-tulis" role="tabpanel" aria-labelledby="tab-tulis">
-        <p style="font-size:var(--text-sm);color:var(--stone-700);margin:0 0 var(--space-4);">Tulis hujah anda tentang syirik berdasarkan peta sebab-akibat.</p>
-        <div style="background:var(--warning-50);border:1px solid var(--warning-500);border-radius:var(--radius-lg);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-4);">
-          <p style="font-size:var(--text-xs);font-weight:600;color:var(--warning-600);margin:0 0 4px;">Contoh permulaan:</p>
-          <p class="ar" style="font-size:var(--text-lg);margin:0;color:var(--stone-900);text-align:right;">إِنَّ الشِّرْكَ لَظُلْمٌ عَظِيمٌ، وَسَبَبُهُ...</p>
-        </div>
-        <div style="position:relative;">
-          <textarea id="tulis-text" dir="rtl" placeholder="اكتب هنا..." class="textarea-ar" oninput="updateWordCount()" aria-label="Tulis hujah dalam bahasa Arab"></textarea>
-          <div style="position:absolute;bottom:12px;left:12px;display:flex;gap:6px;align-items:center;">
-            <span id="word-count-badge" class="word-count"><span id="wc">0</span> kata</span>
-            <span style="background:var(--stone-0);border:1px solid var(--stone-200);color:var(--stone-500);font-size:var(--text-xs);font-weight:600;padding:3px 10px;border-radius:var(--radius-full);">Tahap 2</span>
-          </div>
-        </div>
-        <p style="font-size:var(--text-xs);color:var(--stone-400);margin:6px 0 0;">Guna sekurang-kurangnya 3 dalil. Minimum 10 aksara untuk hantar.</p>
-      </div>
-
-      <!-- Tab: Kuiz -->
-      <div id="panel-kuiz" style="display:none;" role="tabpanel" aria-labelledby="tab-kuiz">
-        <div id="quiz-container"></div>
-        <div id="quiz-result" style="display:none;background:var(--sage-50);border:1px solid var(--sage-200);border-radius:var(--radius-xl);padding:var(--space-4);text-align:center;margin-top:var(--space-4);">
-          <p style="font-size:var(--text-2xl);font-weight:800;color:var(--sage-600);margin:0 0 4px;" id="quiz-score-text"></p>
-          <p style="font-size:var(--text-sm);color:var(--stone-600);margin:0;" id="quiz-feedback-text"></p>
-        </div>
-      </div>
-
-      <!-- Tab: Voice Recording (V6.2 NEW) -->
-      <div id="panel-voice" style="display:none;" role="tabpanel" aria-labelledby="tab-voice">
-
-        <!-- Voice Recorder Card -->
-        <div class="voice-recorder-card">
-          <div class="voice-recorder-header">
-            <h4>🎙️ Latihan Bertutur Bahasa Arab</h4>
-            <p>Rakam ucapan anda berdasarkan topik syirik. Minimum 10 saat.</p>
-          </div>
-
-          <div class="voice-recorder-main">
-            <!-- Record Button -->
-            <button id="voice-record-btn" class="voice-record-btn" onclick="toggleVoiceRecording()" aria-label="Mula atau berhenti rakam">
-              <span class="record-icon-default">🎤</span>
-              <span class="record-icon-active" style="font-size:28px;">⏹</span>
-            </button>
-
-            <!-- Timer -->
-            <div class="voice-timer" id="voice-timer">00:00</div>
-
-            <!-- Status -->
-            <div class="voice-status" id="voice-status">Sedia untuk rakam</div>
-
-            <!-- Waveform Visualizer -->
-            <div class="voice-waveform" id="voice-waveform" aria-hidden="true">
-              <!-- Bars generated by JS -->
+            <div class="voice-controls">
+                <button id="recordBtn" class="record-btn" onclick="toggleRecording()">🎤</button>
+                <div style="width: 100%; text-align: center; margin-top: 10px;">
+                    <span id="recStatus" style="font-size: 0.9rem; color: var(--text-light);">Tekan butang mikrofon untuk merakam</span>
+                </div>
             </div>
 
-            <!-- Guide Box -->
-            <div class="voice-guide-box">
-              <h5>Topik Ucapan:</h5>
-              <p class="ar">إِنَّ الشِّرْكَ لَظُلْمٌ عَظِيمٌ، وَسَبَبُهُ الْجَهْلُ وَالتَّقْلِيدُ الْأَعْمَى، وَالْوِقَايَةُ مِنْهُ بِتَعْلِيمِ التَّوْحِيدِ.</p>
-              <p>"Sesungguhnya syirik itu adalah kezaliman yang amat besar, dan puncanya ialah kejahilan dan ikutan buta, serta pencegahannya melalui pengajaran tauhid."</p>
-              <p style="margin-top:8px;color:var(--stone-500);"><strong>Arahan:</strong> Ucapkan ayat di atas dalam bahasa Arab dengan sebutan yang betul. Anda boleh merujuk transkrip dalam INPUT.</p>
+            <div id="localRecordingsList" style="margin-top: 20px;">
+                <h4>Rakaman Tempatan:</h4>
+                <div id="recordingsContainer"></div>
             </div>
+        </div>
 
-            <!-- Recordings List -->
-            <div class="voice-recordings-list" id="voice-recordings-list">
-              <!-- Populated by JS -->
+        <!-- BAHAGIAN BARU: SENARAI AUDIO UPLOAD (MP3) -->
+        <div class="card" id="uploadedAudioSection" style="border: 2px dashed var(--primary); background: #f0f9ff;">
+            <h2 class="section-title">📂 Bahan Audio Dimuat Naik (MP3/WAV)</h2>
+            <p style="font-size: 0.9rem; margin-bottom: 10px;">Bahan audio yang dimuat naik dari halaman upload akan muncul di sini.</p>
+            <div id="uploadedAudioContainer">
+                <p style="color: #666; font-style: italic;">Memuatkan senarai...</p>
             </div>
-          </div>
         </div>
 
-        <div style="margin-top:var(--space-4);background:var(--info-50);border:1px solid var(--info-500);border-radius:var(--radius-lg);padding:var(--space-3) var(--space-4);">
-          <p style="font-size:var(--text-xs);color:var(--info-500);margin:0;line-height:1.6;">
-            <strong>💡 Tip:</strong> Pastikan persekitaran senyap. Guna fon telinga untuk kualiti audio terbaik. Rakaman akan dihantar bersama output anda ke Google Drive pensyarah.
-          </p>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-secondary" onclick="goToStep(1)">⬅ Kembali</button>
+            <button class="btn btn-primary" onclick="goToStep(3)">Simpan & Teruskan ➡</button>
         </div>
+    </div>
 
-      </div>
-    </div>
-    <div class="dialog-footer">
-      <div id="footer-tulis"><p style="font-size:var(--text-sm);color:var(--stone-400);margin:0;">Tulis 10+ aksara untuk hantar.</p></div>
-      <div id="footer-kuiz" style="display:none;"><p style="font-size:var(--text-sm);color:var(--stone-400);margin:0;">Jawab semua 5 soalan.</p></div>
-      <div id="footer-voice" style="display:none;"><p style="font-size:var(--text-sm);color:var(--stone-400);margin:0;">Rakam minimum 10 saat untuk hantar.</p></div>
-      <button class="btn btn-primary" id="btn-output-submit" onclick="handleOutputSubmit()">Hantar Output ✓</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL 4: REFLEKSI -->
-<div class="dialog-overlay" id="modal-4" role="dialog" aria-modal="true" aria-labelledby="modal4-title">
-  <div class="dialog-box" style="max-width:580px;">
-    <div class="dialog-header">
-      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
-        <div style="width:36px;height:36px;border-radius:var(--radius-md);background:var(--stone-700);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:var(--text-sm);flex-shrink:0;">4</div>
-        <h3 id="modal4-title" style="margin:0;font-size:var(--text-base);font-weight:700;">REFLEKSI RABBANI</h3>
-        <span style="font-size:var(--text-xs);padding:3px 10px;border-radius:var(--radius-full);background:var(--stone-100);color:var(--stone-700);font-weight:600;white-space:nowrap;">C5</span>
-      </div>
-      <button class="btn-icon" onclick="closeModal(4)" aria-label="Tutup dialog">✕</button>
-    </div>
-    <div class="dialog-body">
-      <div style="margin-bottom:var(--space-5);">
-        <h4 style="font-size:var(--text-lg);font-weight:700;margin:0 0 4px;">Bagaimana dalil ini ubah cara saya?</h4>
-        <p style="font-size:var(--text-sm);color:var(--stone-500);margin:0;">Prinsip Rabbani: Sedar, Iqrar, Amal. Tiada jawapan betul atau salah.</p>
-      </div>
-      <div style="background:var(--warning-50);border:1px solid var(--warning-500);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-5);">
-        <p style="font-size:var(--text-xs);font-weight:600;color:var(--warning-600);margin:0 0 6px;text-transform:uppercase;letter-spacing:0.06em;">Dalil Rujukan</p>
-        <p class="ar" style="font-size:var(--text-xl);margin:0 0 4px;color:var(--stone-900);text-align:right;">إِنَّ الشِّرْكَ لَظُلْمٌ عَظِيمٌ</p>
-        <p style="font-size:var(--text-sm);color:var(--stone-600);margin:0;">Sesungguhnya syirik itu adalah kezaliman yang amat besar. (Luqman: 13)</p>
-      </div>
-      <div style="margin-bottom:var(--space-4);">
-        <label for="refleksi-textarea" style="font-size:var(--text-sm);font-weight:600;color:var(--stone-700);margin:0 0 var(--space-2);display:block;">Tulis refleksi anda (Arab atau Melayu):</label>
-        <textarea id="refleksi-textarea" dir="rtl" placeholder="أَشْعُرُ أَنَّ... / Saya rasa bahawa..." class="textarea-ar" style="min-height:140px;font-size:var(--text-base);" aria-describedby="refleksi-hint"></textarea>
-        <p id="refleksi-error" style="font-size:var(--text-xs);color:var(--error-500);margin:4px 0 0;display:none;" role="alert">Sila tulis sekurang-kurangnya 5 aksara untuk simpan refleksi anda.</p>
-        <p id="refleksi-hint" style="font-size:var(--text-xs);color:var(--stone-400);margin:4px 0 0;">Minimum 5 aksara.</p>
-      </div>
-      <div style="margin-bottom:var(--space-4);">
-        <p style="font-size:var(--text-xs);color:var(--stone-400);margin:0 0 var(--space-2);">Frasa pantas:</p>
-        <div class="phrase-chips">
-          <button class="phrase-chip" data-phrase="أَنَا سَأَتْرُكُ " onclick="insertPhrase(this)">أَنَا سَأَتْرُكُ...</button>
-          <button class="phrase-chip" data-phrase="تَعَلَّمْتُ أَنَّ " onclick="insertPhrase(this)">تَعَلَّمْتُ أَنَّ...</button>
-          <button class="phrase-chip" data-phrase="أَسْتَغْفِرُ اللَّهَ " onclick="insertPhrase(this)">أَسْتَغْفِرُ اللَّهَ</button>
-          <button class="phrase-chip" data-phrase="Saya akan " onclick="insertPhrase(this)">Saya akan...</button>
+    <!-- STEP 3: PENAMAT -->
+    <div id="step3" class="step-container">
+        <div class="card" style="text-align: center;">
+            <h2 class="section-title" style="justify-content: center;">✅ Tahniah!</h2>
+            <p>Jawapan anda telah disimpan.</p>
+            <div style="font-size: 3rem; margin: 20px;">🎉</div>
+            <button class="btn btn-primary" onclick="location.reload()">Mula Semula 🔄</button>
         </div>
-      </div>
-      <div style="background:var(--sage-50);border:1px solid var(--sage-200);border-radius:var(--radius-lg);padding:var(--space-4);">
-        <p style="font-size:var(--text-xs);font-weight:700;color:var(--sage-600);text-transform:uppercase;letter-spacing:0.07em;margin:0 0 6px;">Nilai Rabbani (DPRK)</p>
-        <p style="font-size:var(--text-xs);color:var(--stone-600);margin:0;line-height:1.6;">Refleksi ini menghubungkan Akidah dengan amalan harian. Tulislah dengan jujur dan ikhlas.</p>
-      </div>
     </div>
-    <div class="dialog-footer">
-      <p style="font-size:var(--text-sm);color:var(--stone-400);margin:0;">Minimum 5 aksara.</p>
-      <button class="btn btn-primary" onclick="completeStep(4)">Simpan Refleksi ✓</button>
-    </div>
-  </div>
+
 </div>
 
-<!-- MODAL COMPLETE -->
-<div class="dialog-overlay" id="modal-complete" role="dialog" aria-modal="true" aria-labelledby="complete-title">
-  <div class="dialog-box" style="max-width:480px;text-align:center;">
-    <div class="dialog-body" style="padding:var(--space-8) var(--space-6);">
-      <div class="completion-hero" aria-hidden="true">🌿</div>
-      <h2 id="complete-title" style="font-size:var(--text-3xl);font-weight:800;margin:0 0 var(--space-2);color:var(--stone-900);">Tahniah! Modul Selesai</h2>
-      <p class="ar" style="font-size:var(--text-2xl);color:var(--stone-600);margin:0 0 var(--space-4);">بَارَكَ اللَّهُ فِيكَ</p>
-      <p style="font-size:var(--text-sm);color:var(--stone-500);margin:0 0 var(--space-6);line-height:1.6;">Anda telah selesai Modul 1: Syirik. Anda telah belajar kosa kata amaran dan nasihat, struktur sebab-akibat dalam bahasa Arab, dan menghubungkannya dengan nilai Rabbani.</p>
-      <div style="background:var(--stone-100);border-radius:var(--radius-xl);padding:var(--space-4);margin-bottom:var(--space-6);display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:center;">
-        <div><p style="font-size:var(--text-xs);color:var(--stone-500);margin:0 0 2px;">Skor Kuiz</p><p id="final-quiz-score" style="font-size:var(--text-xl);font-weight:800;color:var(--sage-600);margin:0;">-</p></div>
-        <div><p style="font-size:var(--text-xs);color:var(--stone-500);margin:0 0 2px;">Langkah Selesai</p><p style="font-size:var(--text-xl);font-weight:800;color:var(--sage-600);margin:0;">4 / 4</p></div>
-      </div>
-      <div id="drive-status-box" style="border-radius:var(--radius-lg);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-4);font-size:var(--text-sm);font-weight:600;background:var(--warning-50);border:1px solid var(--warning-500);color:var(--warning-600);display:flex;align-items:center;gap:8px;" role="status" aria-live="polite">
-        <span id="drive-status-icon" style="font-size:var(--text-lg);" aria-hidden="true">⏳</span>
-        <span id="drive-status-text">Menghantar ke Google Drive...</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:var(--space-2);align-items:center;margin-bottom:var(--space-4);">
-        <button class="btn btn-primary" onclick="savePDF()" style="width:100%;gap:8px;"><span aria-hidden="true">🖨️</span> Simpan sebagai PDF</button>
-        <button id="btn-retry-drive" onclick="retrySubmission()" style="display:none;width:100%;gap:8px;padding:var(--space-3) var(--space-4);border-radius:var(--radius-lg);border:1.5px solid var(--sage-500);background:var(--stone-0);color:var(--sage-600);font-size:var(--text-sm);font-weight:600;cursor:pointer;font-family:inherit;min-height:44px;" class="btn">🔄 Cuba Hantar Semula ke Drive</button>
-      </div>
-      <p style="font-size:var(--text-xs);color:var(--stone-400);margin:0;">Modul 2 akan dibuka minggu hadapan.</p>
-    </div>
-    <div class="dialog-footer" style="justify-content:center;gap:var(--space-3);">
-      <button class="btn btn-secondary" onclick="closeModal('complete');resetProgress()">Mula Semula</button>
-      <button class="btn btn-primary" onclick="closeModal('complete')">Tutup</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast-container" id="toast-container" role="region" aria-live="polite" aria-atomic="true"></div>
-
-<!-- SCRIPT -->
 <script>
-/* --- KOD PEMAPAR AUDIO TERKINI (PASTI BERFUNGSI) --- */
-
-const DB_NAME = 'eModulIKBAR_DB';
-const DB_VERSION = 1;
-let dbAudio = null;
-
-// Fungsi Utama: Inisialisasi
-function initAudioSystem() {
-    console.log("🔄 Memulakan sistem audio...");
-    
-    // 1. Buka Database
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onupgradeneeded = function(event) {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains('audioUploads')) {
-            db.createObjectStore('audioUploads', { keyPath: 'id', autoIncrement: true });
-            console.log("✅ Database dicipta.");
+    // --- 1. NAVIGASI ASAS ---
+    function goToStep(stepNum) {
+        const nameInput = document.getElementById('studentName');
+        if (stepNum === 2 && !nameInput.value.trim()) {
+            alert('Sila masukkan nama anda dahulu.');
+            return;
         }
-    };
 
-    request.onsuccess = function(event) {
-        dbAudio = event.target.result;
-        console.log("✅ Database berjaya dibuka.");
+        document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+        document.getElementById(`step${stepNum}`).classList.add('active');
         
-        // Semak jika container wujud, jika tidak, cuba cipta secara dinamik sebagai backup
-        let container = document.getElementById('forcedAudioContainer');
-        if (!container) {
-            createBackupContainer();
-            container = document.getElementById('forcedAudioContainer');
+        if (stepNum === 2) {
+            loadUploadedAudio(); // Muat audio bila masuk step 2
         }
-        
-        // Load data
-        loadAndRenderAudio();
-    };
-
-    request.onerror = function(event) {
-        console.error("❌ Ralat Database:", event.target.errorCode);
-        alert("Ralat mengakses database pelayar.");
-    };
-}
-
-// Fungsi Backup: Cipta container jika user lupa letak HTML manual
-function createBackupContainer() {
-    console.log("⚠️ Container tidak dijumpai, mencipta backup...");
-    const newDiv = document.createElement('div');
-    newDiv.id = 'forcedAudioContainer';
-    newDiv.style.cssText = "width: 90%; margin: 20px auto; padding: 20px; background: #fffbeb; border: 2px solid #f59e0b; border-radius: 10px; font-family: sans-serif;";
-    newDiv.innerHTML = `<h3 style="color:#b45309">📂 Bahan Audio Dimuat Naik</h3><div id="audioListContent"></div>`;
-    
-    // Letak di akhir body sebelum script
-    document.body.insertBefore(newDiv, document.body.lastElementChild);
-}
-
-// Fungsi Load & Render
-function loadAndRenderAudio() {
-    if (!dbAudio) return;
-
-    const contentDiv = document.getElementById('audioListContent');
-    if (!contentDiv) return;
-
-    const transaction = dbAudio.transaction(['audioUploads'], 'readonly');
-    const store = transaction.objectStore('audioUploads');
-    const getAllRequest = store.getAll();
-
-    getAllRequest.onsuccess = function() {
-        const items = getAllRequest.result;
-        renderItems(items, contentDiv);
-    };
-
-    getAllRequest.onerror = function() {
-        contentDiv.innerHTML = "<p style='color:red'>Gagal membaca data.</p>";
-    };
-}
-
-// Fungsi Paparan (Render)
-function renderItems(items, container) {
-    container.innerHTML = ""; // Kosongkan dulu
-
-    if (!items || items.length === 0) {
-        container.innerHTML = `
-            <p style="color: #666; font-style: italic;">
-                Belum ada bahan audio dimuat naik. 
-                <br>Sila gunakan fail <strong>upload_audio.html</strong> untuk menambah bahan.
-            </p>`;
-        return;
     }
 
-    // Loop setiap item
-    items.forEach(item => {
-        const card = document.createElement('div');
-        card.style.cssText = "background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #16a34a;";
-        
-        // Tajuk & Kategori
-        const header = document.createElement('div');
-        header.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;";
-        header.innerHTML = `
-            <strong style="font-size: 1.1rem; color: #333;">${item.topic || 'Tanpa Tajuk'}</strong>
-            <span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">${item.category || 'Umum'}</span>
+    // --- 2. FUNGSI RAKAMAN SUARA (WEB AUDIO API) ---
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+    const recordBtn = document.getElementById('recordBtn');
+    const recStatus = document.getElementById('recStatus');
+    const recordingsContainer = document.getElementById('recordingsContainer');
+
+    async function toggleRecording() {
+        if (!isRecording) {
+            // Mula Rakam
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' }); // Atau audio/webm
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    addRecordingToUI(audioUrl);
+                    saveRecordingToLocal(audioBlob);
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                recordBtn.classList.add('recording');
+                recStatus.textContent = "Sedang merakam... Tekan lagi untuk berhenti.";
+                recStatus.style.color = "var(--danger)";
+            } catch (err) {
+                alert("Ralat: Tidak dapat mengakses mikrofon. Sila benarkan akses.");
+                console.error(err);
+            }
+        } else {
+            // Berhenti Rakam
+            mediaRecorder.stop();
+            isRecording = false;
+            recordBtn.classList.remove('recording');
+            recStatus.textContent = "Rakaman selesai.";
+            recStatus.style.color = "var(--secondary)";
+            setTimeout(() => recStatus.textContent = "Tekan butang mikrofon untuk merakam", 3000);
+        }
+    }
+
+    function addRecordingToUI(url) {
+        const div = document.createElement('div');
+        div.className = 'audio-item';
+        div.innerHTML = `
+            <strong>Rakaman Baru (${new Date().toLocaleTimeString()})</strong>
+            <audio controls src="${url}"></audio>
         `;
+        recordingsContainer.prepend(div);
+    }
 
-        // Keterangan
-        const desc = document.createElement('p');
-        desc.style.cssText = "margin: 5px 0; color: #555; font-size: 0.9rem;";
-        desc.textContent = item.description || '';
+    function saveRecordingToLocal(blob) {
+        // Simpan ringkas dalam localStorage (had saiz kecil)
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+            const base64data = reader.result;
+            let history = JSON.parse(localStorage.getItem('ikbar_recordings') || '[]');
+            history.push({ date: new Date().toISOString(), data: base64data });
+            // Potong jika terlalu banyak
+            if(history.length > 5) history.shift(); 
+            localStorage.setItem('ikbar_recordings', JSON.stringify(history));
+        };
+    }
 
-        // Audio Player
-        const audio = document.createElement('audio');
-        audio.controls = true;
-        audio.style.width = "100%";
-        audio.style.marginTop = "10px";
-        audio.src = item.audioData; // Data Base64 dari IndexedDB
+    function loadLocalRecordings() {
+        const history = JSON.parse(localStorage.getItem('ikbar_recordings') || '[]');
+        history.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'audio-item';
+            div.innerHTML = `
+                <strong>Rakaman Lama</strong>
+                <audio controls src="${item.data}"></audio>
+            `;
+            recordingsContainer.appendChild(div);
+        });
+    }
 
-        // Butang Padam
-        const delBtn = document.createElement('button');
-        delBtn.textContent = "🗑️ Padam";
-        delBtn.style.cssText = "margin-top: 10px; background: #fee2e2; color: #991b1b; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right;";
-        delBtn.onclick = function() { deleteItem(item.id); };
+    // --- 3. INTEGRASI INDEXEDDB (UPLOAD MP3) ---
+    const DB_NAME = 'eModulIKBAR_DB';
+    const DB_VERSION = 1;
+    let dbAudioInstance = null;
 
-        card.appendChild(header);
-        card.appendChild(desc);
-        card.appendChild(audio);
-        card.appendChild(delBtn);
-        
-        // Clear float
-        const clear = document.createElement('div');
-        clear.style.clear = "both";
-        card.appendChild(clear);
+    function initAudioDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('audioUploads')) {
+                    db.createObjectStore('audioUploads', { keyPath: 'id', autoIncrement: true });
+                }
+            };
 
-        container.appendChild(card);
+            request.onsuccess = (event) => {
+                dbAudioInstance = event.target.result;
+                resolve(dbAudioInstance);
+            };
+
+            request.onerror = (event) => {
+                console.error("Gagal buka DB:", event.target.errorCode);
+                reject(event.target.errorCode);
+            };
+        });
+    }
+
+    async function loadUploadedAudio() {
+        const container = document.getElementById('uploadedAudioContainer');
+        container.innerHTML = '<p style="color:#666; font-style:italic;">Memuatkan senarai...</p>';
+
+        try {
+            if (!dbAudioInstance) await initAudioDB();
+
+            const transaction = dbAudioInstance.transaction(['audioUploads'], 'readonly');
+            const store = transaction.objectStore('audioUploads');
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const items = request.result;
+                renderAudioList(items);
+            };
+        } catch (error) {
+            container.innerHTML = '<p style="color:red;">Gagal memuatkan audio. Sila semak console.</p>';
+            console.error(error);
+        }
+    }
+
+    function renderAudioList(items) {
+        const container = document.getElementById('uploadedAudioContainer');
+        container.innerHTML = '';
+
+        if (items.length === 0) {
+            container.innerHTML = '<p style="color:#666; font-style:italic; text-align:center;">Tiada bahan audio dimuat naik. Sila gunakan halaman upload_audio.html.</p>';
+            return;
+        }
+
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'audio-item';
+            card.style.borderLeft = '4px solid var(--primary)';
+            
+            const header = document.createElement('div');
+            header.style.display = 'flex';
+            header.style.justifyContent = 'space-between';
+            header.style.alignItems = 'center';
+            
+            const title = document.createElement('strong');
+            title.textContent = item.topic || 'Audio Tanpa Tajuk';
+            
+            const badge = document.createElement('span');
+            badge.textContent = item.category || 'Umum';
+            badge.style.background = '#dbeafe';
+            badge.style.color = '#1e40af';
+            badge.style.padding = '2px 6px';
+            badge.style.borderRadius = '4px';
+            badge.style.fontSize = '0.7rem';
+            
+            header.appendChild(title);
+            header.appendChild(badge);
+
+            const desc = document.createElement('p');
+            desc.textContent = item.description || '';
+            desc.style.fontSize = '0.85rem';
+            desc.style.margin = '5px 0';
+            desc.style.color = '#555';
+
+            const audioEl = document.createElement('audio');
+            audioEl.controls = true;
+            audioEl.src = item.audioData;
+            audioEl.style.width = '100%';
+
+            const delBtn = document.createElement('button');
+            delBtn.textContent = '🗑️ Padam';
+            delBtn.style.background = '#fee2e2';
+            delBtn.style.color = '#b91c1c';
+            delBtn.style.border = 'none';
+            delBtn.style.padding = '4px 8px';
+            delBtn.style.borderRadius = '4px';
+            delBtn.style.cursor = 'pointer';
+            delBtn.style.fontSize = '0.75rem';
+            delBtn.style.alignSelf = 'flex-end';
+            delBtn.onclick = () => deleteAudioItem(item.id);
+
+            card.appendChild(header);
+            card.appendChild(desc);
+            card.appendChild(audioEl);
+            card.appendChild(delBtn);
+
+            container.appendChild(card);
+        });
+    }
+
+    function deleteAudioItem(id) {
+        if(!confirm("Padam fail ini?")) return;
+        const tx = dbAudioInstance.transaction(['audioUploads'], 'readwrite');
+        tx.objectStore('audioUploads').delete(id);
+        tx.oncomplete = () => {
+            alert("Dipadam.");
+            loadUploadedAudio();
+        };
+    }
+
+    // --- INITIALIZATION ---
+    window.addEventListener('DOMContentLoaded', () => {
+        loadLocalRecordings();
+        // Init DB secara background
+        initAudioDB().catch(console.error);
     });
-}
 
-// Fungsi Padam
-function deleteItem(id) {
-    if(!confirm("Adakah anda pasti mahu memadam fail ini?")) return;
-
-    const transaction = dbAudio.transaction(['audioUploads'], 'readwrite');
-    const store = transaction.objectStore('audioUploads');
-    store.delete(id);
-
-    transaction.oncomplete = function() {
-        alert("Fail berjaya dipadam!");
-        loadAndRenderAudio(); // Refresh semula
-    };
-}
-
-// JALANKAN SISTEM APABILA HALAMAN SIAP
-window.addEventListener('DOMContentLoaded', initAudioSystem);
-
-/* --- TAMAT KOD --- */
 </script>
-  <!-- WADAH PAKSAAAN UNTUK AUDIO UPLOAD -->
-<div id="forcedAudioContainer" style="width: 100%; margin: 20px 0; padding: 20px; background: #f0fdf4; border: 2px dashed #16a34a; border-radius: 10px; display: block;">
-    <h3 style="margin-top: 0; color: #15803d;">📂 Bahan Audio Dimuat Naik</h3>
-    <div id="audioListContent">Memuatkan senarai...</div>
-</div>
-<!-- TAMAT WADAH PAKSAAAN -->
+
 </body>
 </html>
