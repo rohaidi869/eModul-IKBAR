@@ -3,364 +3,498 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Bahan Pengajaran - Audio/MP3</title>
+    <title>Upload Bahan Audio ke eModul IKBAR</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --error: #ef4444;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            margin: 0;
             padding: 20px;
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 600px;
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             width: 100%;
+            max-width: 500px;
         }
 
-        h1 {
-            color: #333;
+        h2 {
             text-align: center;
-            margin-bottom: 10px;
-            font-size: 28px;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
         }
-
-        .subtitle {
-            color: #666;
+        
+        p.subtitle {
             text-align: center;
-            margin-bottom: 30px;
-            font-size: 14px;
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
         }
 
-        .upload-area {
-            border: 3px dashed #667eea;
-            border-radius: 15px;
-            padding: 40px 20px;
+        /* Drag & Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--primary);
+            border-radius: 8px;
+            padding: 2rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #f8f9ff;
-            margin-bottom: 20px;
+            background-color: #eff6ff;
+            position: relative;
         }
 
-        .upload-area:hover,
-        .upload-area.dragover {
-            border-color: #764ba2;
-            background: #f0f2ff;
+        .drop-zone.drag-over {
+            background-color: #dbeafe;
+            border-color: var(--primary-dark);
             transform: scale(1.02);
         }
 
-        .upload-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
+        .drop-zone p {
+            margin: 10px 0 0;
+            color: #6b7280;
+            font-size: 0.9rem;
         }
 
-        .upload-text {
-            color: #555;
-            font-size: 16px;
+        .icon-upload {
+            font-size: 3rem;
+            color: var(--primary);
             margin-bottom: 10px;
-        }
-
-        .upload-hint {
-            color: #888;
-            font-size: 13px;
         }
 
         #fileInput {
             display: none;
         }
 
+        /* File Info & Preview */
         .file-info {
-            background: #f8f9ff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
+            margin-top: 1.5rem;
             display: none;
-        }
-
-        .file-info.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
 
         .file-details {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
         .file-icon {
-            font-size: 40px;
-        }
-
-        .file-meta {
-            flex: 1;
+            font-size: 1.5rem;
         }
 
         .file-name {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
+            font-weight: 600;
             word-break: break-all;
+            font-size: 0.9rem;
         }
 
-        .file-size {
-            color: #666;
-            font-size: 13px;
-        }
-
-        .audio-player {
+        audio {
             width: 100%;
-            margin-top: 15px;
+            margin-top: 10px;
+            outline: none;
         }
 
+        /* Form Inputs */
         .form-group {
-            margin-bottom: 20px;
+            margin-top: 1.5rem;
         }
 
         label {
             display: block;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 14px;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
         }
 
-        input[type="text"],
-        textarea,
+        input[type="text"], 
+        textarea, 
         select {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-
-        input[type="text"]:focus,
-        textarea:focus,
-        select:focus {
-            outline: none;
-            border-color: #667eea;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
         }
 
         textarea {
             resize: vertical;
-            min-height: 100px;
+            height: 80px;
         }
 
-        .btn {
+        /* Button & Progress */
+        .btn-upload {
             width: 100%;
-            padding: 15px;
+            background-color: var(--primary);
+            color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            margin-top: 1.5rem;
+            transition: background 0.2s;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .btn-upload:hover {
+            background-color: var(--primary-dark);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-primary:disabled {
-            background: #ccc;
+        .btn-upload:disabled {
+            background-color: #9ca3af;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
         }
 
         .progress-container {
-            margin-top: 20px;
+            margin-top: 1rem;
             display: none;
         }
 
         .progress-bar {
             height: 8px;
-            background: #e0e0e0;
+            background-color: #e5e7eb;
             border-radius: 4px;
             overflow: hidden;
-            margin-bottom: 10px;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: var(--success);
             width: 0%;
             transition: width 0.3s ease;
         }
 
-        .progress-text {
+        .status-text {
             text-align: center;
-            color: #666;
-            font-size: 13px;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            color: #6b7280;
         }
 
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
+        .message-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
             display: none;
-            text-align: center;
         }
 
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            display: none;
-            text-align: center;
+        .success-box {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #34d399;
         }
 
-        .supported-formats {
-            margin-top: 20px;
-            padding: 15px;
-            background: #fff3cd;
-            border-radius: 10px;
-            font-size: 13px;
-            color: #856404;
-        }
-
-        .supported-formats strong {
-            display: block;
-            margin-bottom: 5px;
+        .error-box {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #f87171;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎙️ Upload Bahan Pengajaran</h1>
-        <p class="subtitle">Muat naik fail audio untuk bahan pembelajaran</p>
 
-        <!-- Upload Area -->
-        <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">📁</div>
-            <p class="upload-text">Seret & lepaskan fail audio di sini</p>
-            <p class="upload-hint">atau klik untuk memilih fail</p>
-            <input type="file" id="fileInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac">
-        </div>
-
-        <!-- Supported Formats -->
-        <div class="supported-formats">
-            <strong>Format yang disokong:</strong>
-            MP3, WAV, OGG, M4A, AAC, FLAC (Maksimum: 50MB)
-        </div>
-
-        <!-- File Info & Preview -->
-        <div class="file-info" id="fileInfo">
-            <div class="file-details">
-                <span class="file-icon">🎵</span>
-                <div class="file-meta">
-                    <div class="file-name" id="fileName"></div>
-                    <div class="file-size" id="fileSize"></div>
-                </div>
-            </div>
-            <audio class="audio-player" id="audioPlayer" controls></audio>
-        </div>
-
-        <!-- Metadata Form -->
-        <form id="uploadForm" style="display: none;">
-            <div class="form-group">
-                <label for="title">Tajuk Bahan *</label>
-                <input type="text" id="title" placeholder="Masukkan tajuk bahan pengajaran" required>
-            </div>
-
-            <div class="form-group">
-                <label for="subject">Subjek / Mata Pelajaran</label>
-                <input type="text" id="subject" placeholder="Contoh: Bahasa Melayu, Matematik">
-            </div>
-
-            <div class="form-group">
-                <label for="grade">Tahun / Tingkatan</label>
-                <select id="grade">
-                    <option value="">Pilih tahap</option>
-                    <option value="tahun1">Tahun 1</option>
-                    <option value="tahun2">Tahun 2</option>
-                    <option value="tahun3">Tahun 3</option>
-                    <option value="tahun4">Tahun 4</option>
-                    <option value="tahun5">Tahun 5</option>
-                    <option value="tahun6">Tahun 6</option>
-                    <option value="ting1">Tingkatan 1</option>
-                    <option value="ting2">Tingkatan 2</option>
-                    <option value="ting3">Tingkatan 3</option>
-                    <option value="ting4">Tingkatan 4</option>
-                    <option value="ting5">Tingkatan 5</option>
-                    <option value="lain-lain">Lain-lain</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="description">Penerangan Ringkas</label>
-                <textarea id="description" placeholder="Terangkan kandungan audio ini..."></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary" id="uploadBtn">
-                📤 Muat Naik Sekarang
-            </button>
-            <button type="button" class="btn btn-secondary" id="cancelBtn">
-                ❌ Batal
-            </button>
-        </form>
-
-        <!-- Progress Bar -->
-        <div class="progress-container" id="progressContainer">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <p class="progress-text" id="progressText">Memuat naik... 0%</p>
-        </div>
-
-        <!-- Success Message -->
-        <div class="success-message" id="successMessage">
-            ✅ <strong>Berjaya!</strong> Bahan pengajaran telah dimuat naik.
-        </div>
-
-        <!-- Error Message -->
-        <div class="error-message" id="errorMessage">
-            ❌ <strong>Ralat!</strong> Sila cuba lagi.
-        </div>
+<div class="container">
+    <h2>📤 Upload Bahan Audio</h2>
+    <p class="subtitle">Simpan terus ke eModul IKBAR (IndexedDB)</p>
+    
+    <!-- Kawasan Drag & Drop -->
+    <div class="drop-zone" id="dropZone">
+        <div class="icon-upload">🎵</div>
+        <p><strong>Seret fail MP3/WAV ke sini</strong></p>
+        <p>atau klik untuk memilih fail</p>
+        <input type="file" id="fileInput" accept="audio/*">
     </div>
 
-    <script src="audio-upload.js"></script>
+    <!-- Maklumat Fail & Preview -->
+    <div class="file-info" id="fileInfo">
+        <div class="file-details">
+            <span class="file-icon">🎧</span>
+            <span class="file-name" id="fileName">nama_fail.mp3</span>
+        </div>
+        <div style="font-size: 0.85rem; color: #666;" id="fileSize">Saiz: 0 MB</div>
+        <audio id="audioPreview" controls></audio>
+    </div>
+
+    <!-- Borang Metadata -->
+    <div class="form-group">
+        <label for="topic">Tajuk Pengajaran *</label>
+        <input type="text" id="topic" placeholder="Cth: Bab 1 - Pengenalan Sains">
+    </div>
+
+    <div class="form-group">
+        <label for="description">Keterangan Ringkas</label>
+        <textarea id="description" placeholder="Huraikan kandungan audio ini..."></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="category">Kategori</label>
+        <select id="category">
+            <option value="kuliah">Kuliah / Syarahan</option>
+            <option value="podcast">Podcast Pendidikan</option>
+            <option value="latihan">Latihan Sebutan/Bacaan</option>
+            <option value="lain-lain">Lain-lain</option>
+        </select>
+    </div>
+
+    <!-- Butang Upload -->
+    <button class="btn-upload" id="uploadBtn" disabled>Muat Naik ke eModul IKBAR</button>
+
+    <!-- Progress Bar -->
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="status-text" id="statusText">Memproses fail...</div>
+    </div>
+
+    <!-- Mesej Status -->
+    <div id="messageBox" class="message-box"></div>
+</div>
+
+<script>
+    // --- KONFIGURASI DATABASE ---
+    const DB_NAME = 'eModulIKBAR_DB';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'audioMaterials';
+
+    // Elemen DOM
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileNameDisplay = document.getElementById('fileName');
+    const fileSizeDisplay = document.getElementById('fileSize');
+    const audioPreview = document.getElementById('audioPreview');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const statusText = document.getElementById('statusText');
+    const messageBox = document.getElementById('messageBox');
+
+    let selectedFile = null;
+    let db = null;
+
+    // 1. Inisialisasi Database IndexedDB
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+            request.onupgradeneeded = (event) => {
+                const database = event.target.result;
+                if (!database.objectStoreNames.contains(STORE_NAME)) {
+                    database.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                }
+            };
+
+            request.onsuccess = (event) => {
+                db = event.target.result;
+                console.log('Database berjaya dibuka:', DB_NAME);
+                resolve(db);
+            };
+
+            request.onerror = (event) => {
+                console.error('Ralat membuka database:', event.target.error);
+                reject('Gagal membuka database.');
+            };
+        });
+    }
+
+    // Jalankan inisialisasi serta-merta
+    initDB().catch(err => showMessage(err, 'error'));
+
+    // 2. Event Listeners untuk Fail
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) handleFile(e.target.files[0]);
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) handleFile(files[0]);
+    });
+
+    // 3. Proses Fail
+    function handleFile(file) {
+        // Reset mesej
+        messageBox.style.display = 'none';
+
+        // Validasi Jenis
+        if (!file.type.startsWith('audio/')) {
+            showMessage('Ralat: Sila pilih fail audio sahaja (MP3, WAV, OGG).', 'error');
+            return;
+        }
+
+        // Validasi Saiz (Max 50MB untuk keselamatan browser)
+        const maxSize = 50 * 1024 * 1024; 
+        if (file.size > maxSize) {
+            showMessage(`Ralat: Fail terlalu besar (${(file.size/1024/1024).toFixed(2)}MB). Had maksimum 50MB.`, 'error');
+            return;
+        }
+
+        selectedFile = file;
+
+        // Paparkan maklumat
+        fileNameDisplay.textContent = file.name;
+        fileSizeDisplay.textContent = `Saiz: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+        
+        const fileURL = URL.createObjectURL(file);
+        audioPreview.src = fileURL;
+        
+        fileInfo.style.display = 'block';
+        uploadBtn.disabled = false;
+    }
+
+    // 4. Fungsi Upload ke IndexedDB
+    uploadBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+
+        const topic = document.getElementById('topic').value.trim();
+        if (!topic) {
+            showMessage('Sila masukkan Tajuk Pengajaran.', 'error');
+            return;
+        }
+
+        if (!db) {
+            showMessage('Database belum siap. Sila cuba sebentar lagi.', 'error');
+            return;
+        }
+
+        // UI Updates
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Sedang Menyimpan...';
+        progressContainer.style.display = 'block';
+        messageBox.style.display = 'none';
+        
+        try {
+            // Simulasi progress (kerana penyimpanan blob adalah instant tapi kita nak bagi visual)
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                if (progress > 90) progress = 90; // Tahan di 90% sampai selesai
+                progressFill.style.width = `${progress}%`;
+                statusText.textContent = `Menyimpan data audio... ${progress}%`;
+            }, 200);
+
+            // Baca fail sebagai Blob/DataURL untuk disimpan
+            const reader = new FileReader();
+            
+            reader.onload = async (e) => {
+                const audioData = e.target.result; // Ini adalah DataURL (base64)
+                
+                const record = {
+                    fileName: selectedFile.name,
+                    fileType: selectedFile.type,
+                    fileSize: selectedFile.size,
+                    topic: topic,
+                    description: document.getElementById('description').value,
+                    category: document.getElementById('category').value,
+                    audioData: audioData, // Simpan seluruh fail di sini
+                    dateAdded: new Date().toISOString()
+                };
+
+                try {
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.add(record);
+
+                    request.onsuccess = () => {
+                        clearInterval(interval);
+                        progressFill.style.width = '100%';
+                        statusText.textContent = 'Selesai!';
+                        
+                        showMessage('✅ BERJAYA! Bahan audio telah disimpan. Sila buka tab eModul IKBAR dan muat semula (F5).', 'success');
+                        
+                        uploadBtn.textContent = 'Muat Naik Lagi';
+                        uploadBtn.disabled = false;
+                        
+                        // Reset form secara automatik selepas 3 saat jika user mahu
+                        setTimeout(() => {
+                            // Optional: Reset fields
+                            // fileInput.value = '';
+                            // fileInfo.style.display = 'none';
+                            // document.getElementById('topic').value = '';
+                            // selectedFile = null;
+                            // uploadBtn.disabled = true;
+                        }, 3000);
+                    };
+
+                    request.onerror = () => {
+                        clearInterval(interval);
+                        throw new Error('Gagal menyimpan ke database.');
+                    };
+
+                } catch (dbError) {
+                    clearInterval(interval);
+                    throw dbError;
+                }
+            };
+
+            reader.onerror = () => {
+                clearInterval(interval);
+                throw new Error('Gagal membaca fail.');
+            };
+
+            // Mulakan pembacaan fail
+            reader.readAsDataURL(selectedFile);
+
+        } catch (error) {
+            console.error(error);
+            progressContainer.style.display = 'none';
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'Muat Naik ke eModul IKBAR';
+            showMessage('❌ Ralat: ' + error.message, 'error');
+        }
+    });
+
+    function showMessage(msg, type) {
+        messageBox.textContent = msg;
+        messageBox.className = `message-box ${type === 'success' ? 'success-box' : 'error-box'}`;
+        messageBox.style.display = 'block';
+    }
+</script>
+
 </body>
 </html>
